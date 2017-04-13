@@ -8,7 +8,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
 
 ### Need to Have
 * Detect lines going over 80 characters
-  ```
+  ```ocaml
   let new_mass = new mass (50. +. Random.float 400.) (50. +. Random.float 400.) 1.0 ;;
 
   let new_mass = new mass (50. +. Random.float 400.)
@@ -16,7 +16,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
                           1. ;;
   ```
 * Check for improper indentation
-  ```
+  ```ocaml
   let add (x : int) (y : int) = 
   if x = 4 then x - y 
   else x + y ;;
@@ -26,7 +26,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
     else x + y ;;
   ```
 * Detect singular match statements
-  ```
+  ```ocaml
   let x = 
     match y with
     | (_a, b) -> b ;;
@@ -34,13 +34,13 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
   let (_a, x) = y ;;
   ```
 * Detect unmatched parentheses
-  ```
+  ```ocaml
   assert (List.fold_left (fun x y -> x + y) 0 [1; 2; 3] = 6 ;;
 
   assert (List.fold_left (fun x y -> x + y) 0 [1; 2; 3] = 6) ;;
   ```
 * Detect no spaces before semicolons or other operators
-  ```
+  ```ocaml
   let x=1+2;;
 
   let x = 1 + 2 ;;
@@ -48,13 +48,13 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
 
 ### Want to Have
 * Detect chances for partially applied functions
-  ```
+  ```ocaml
   let sum l = List.fold_left ( + ) 0 l ;;
 
   let sum = List.fold_left ( + ) 0 ;;
   ```
 * Detect unnecessary if-else statements
-  ```
+  ```ocaml
   let b = 
     if x = y then false
     else true ;;
@@ -73,7 +73,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
     else x = y || f (x - 1) (y - 2) ;;
   ```
 * Detect unnecessary semicolon use
-  ```
+  ```ocaml
   let sum = List.fold_left ( + ) 0 ;;
 
   let y = sum [1; 2; 3; 4] ;;
@@ -85,7 +85,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
   let y = sum [1; 2; 3; 4]
   ```
 * Detect repeated code
-  ```
+  ```ocaml
   let is_sum_odd l = (List.fold_left ( + ) 0 l) mod 2 = 1 ;;
 
   let is_sum_even l = (List.fold_left ( + ) 0 l) mod 2 = 0 ;;
@@ -99,13 +99,13 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
   let is_sum_even l = (sum l) mod 2 = 0 ;;
   ```
 * Advise on use of float versus integer operations
-  ```
+  ```ocaml
   let sum_float_list = List.fold_left ( + ) 0. ;;
 
   let sum_float_list = List.fold_left ( +. ) 0. ;;
   ```
 ### Ideals
-In the most ideal case, the linter would not only be able to detect the above issues but also fix them automatically, like they were fixed manually above. We predict this would be a very hard problem, but if we accomplish our other goals, we would definitely like to tackle this one
+In the most ideal case, the linter would not only be able to detect the above issues but also fix them automatically, like they were fixed manually above. We predict this would be a very hard problem, but if we accomplish our other goals, we would definitely like to tackle this one.
 
 ## Timeline
 At the midpoint check-in, we would like to have all the need-to-have goals completed and fully functioning. We plan to have made progress on the want-to-have goals by this time as well. By the end of the project, we plan to have most, if not all, of the want-to-have goals completed and the beginnings of progress on the ideal goals.
