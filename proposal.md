@@ -7,13 +7,105 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
 ## Goals
 
 ### Need to Have
-With its most basic functionality, the code should be able to detect lines going over the 80 character limit. This should be trivial to implement. Additionally, the linter should be able to check for improper indentation. Although this is a slightly harder problem, it should still be straightforward to implement. Detection of singular match statements, which can be converted to let statements, should also be a basic functionality of the linter. The linter should also check for unmatched parentheses and warn about runaway match statements.
+* Detect lines going over 80 characters
+  ```
+  let new_mass = new mass (50. +. Random.float 400.) (50. +. Random.float 400.) 1.0 ;;
+
+  let new_mass = new mass (50. +. Random.float 400.)
+                          (50. +. Random.float 400.)
+                          1. ;;
+  ```
+* Check for improper indentation
+  ```
+  let add (x : int) (y : int) = 
+  if x = 4 then x - y 
+  else x + y ;;
+
+  let add (x : int) (y : int) =
+    if x = 4 then x - y
+    else x + y ;;
+  ```
+* Detect singular match statements
+  ```
+  let x = 
+    match y with
+    | (_a, b) -> b ;;
+
+  let (_a, x) = y ;;
+  ```
+* Detect unmatched parentheses
+  ```
+  assert (List.fold_left (fun x y -> x + y) 0 [1; 2; 3] = 6 ;;
+
+  assert (List.fold_left (fun x y -> x + y) 0 [1; 2; 3] = 6) ;;
+  ```
+* Detect no spaces before semicolons or other operators
+  ```
+  let x=1+2;;
+
+  let x = 1 + 2 ;;
+  ```
 
 ### Want to Have
-Code optimizations would be the next level of difficulty for our project. Getting partially applied functions would be our first step in this direction. In fact, this should not be that difficult since functions that can be partially evaluated have a "common denominator" where the last argument on both sides of the function are the same. The next step in optimizations would be simplifying if-else statements into simple boolean logic. We would also like for the linter to be able to detect repeated code (never write the same code twice) and notify the user of potential refactoring. The linter may also advise on the use of float vs. integer operations.
+* Detect chances for partially applied functions
+  ```
+  let sum l = List.fold_left ( + ) 0 l ;;
 
-### Dreams of Beyond
-In the most ideal case, the linter would not only be able to detect the above issues but also fix them automatically. It would be able to detect lines going over the 80 character limit and intelligently add newlines and tabs to get it under the limit. It should be able to replace unnecessary if-else statements with boolean logic. This would be an incredible tool, and it would be fantasy to manage to create it.
+  let sum = List.fold_left ( + ) 0 ;;
+  ```
+* Detect unnecessary if-else statements
+  ```
+  let b = 
+    if x = y then false
+    else true ;;
+
+  let b = x <> y ;;
+
+  ========================================
+
+  let rec f x y =
+    if x <= 0 || y <= 0 then false
+    else if x = y then true
+    else f (x - 1) (y - 2) ;;
+
+  let rec f x y = 
+    if x <= 0 || y <= 0 then false
+    else x = y || f (x - 1) (y - 2) ;;
+  ```
+* Detect unnecessary semicolon use
+  ```
+  let sum = List.fold_left ( + ) 0 ;;
+
+  let y = sum [1; 2; 3; 4] ;;
+
+  ========================================
+
+  let sum = List.fold_left ( + ) 0 
+
+  let y = sum [1; 2; 3; 4]
+  ```
+* Detect repeated code
+  ```
+  let odd_sum l = List.fold_left ( + ) 0 l mod 2 = 1 ;;
+
+  let even_sum l = List.fold_left ( + ) 0 l mod 2 = 0 ;;
+
+  ========================================
+
+  let sum = List.fold_left ( + ) 0 ;;
+
+  let odd_sum l = sum l mod 2 = 1 ;;
+
+  let even_sum l = sum l mod 2 = 0 ;;
+  ```
+* Advise on use of float versus integer operations
+  ```
+  let sum_float_list = List.fold_left ( + ) 0. ;;
+
+  let sum_float_list = List.fold_left ( +. ) 0. ;;
+  ```
+### Ideals
+In the most ideal case, the linter would not only be able to detect the above issues but also fix them automatically, like they were fixed manually above. We predict this would be a very hard problem, but if we accomplish our other goals, we would definitely like to tackle this one
 
 ## Timeline
-At the midpoint check-in, we would like to have all the need-to-have goals completed and fully functioning. We plan to have made progress on the want-to-have goals by this time as well. By the end of the project, we plan to have most, if not all, of the want-to-have goals completed and the beginnings of progress of the dream goals.
+At the midpoint check-in, we would like to have all the need-to-have goals completed and fully functioning. We plan to have made progress on the want-to-have goals by this time as well. By the end of the project, we plan to have most, if not all, of the want-to-have goals completed and the beginnings of progress on the ideal goals.
