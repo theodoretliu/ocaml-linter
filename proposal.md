@@ -86,17 +86,17 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
   ```
 * Detect repeated code
   ```
-  let odd_sum l = List.fold_left ( + ) 0 l mod 2 = 1 ;;
+  let is_sum_odd l = (List.fold_left ( + ) 0 l) mod 2 = 1 ;;
 
-  let even_sum l = List.fold_left ( + ) 0 l mod 2 = 0 ;;
+  let is_sum_even l = (List.fold_left ( + ) 0 l) mod 2 = 0 ;;
 
   ========================================
 
   let sum = List.fold_left ( + ) 0 ;;
 
-  let odd_sum l = sum l mod 2 = 1 ;;
+  let is_sum_odd l = (sum l) mod 2 = 1 ;;
 
-  let even_sum l = sum l mod 2 = 0 ;;
+  let is_sum_even l = (sum l) mod 2 = 0 ;;
   ```
 * Advise on use of float versus integer operations
   ```
