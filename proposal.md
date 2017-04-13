@@ -16,3 +16,4 @@ Code optimizations would be the next level of difficulty for our project. Gettin
 In the most ideal case, the linter would not only be able to detect the above issues but also fix them automatically. It would be able to detect lines going over the 80 character limit and intelligently add newlines and tabs to get it under the limit. It should be able to replace unnecessary if-else statements with boolean logic. This would be an incredible tool, and it would be fantasy to manage to create it.
 
 ## Timeline
+At the midpoint check-in, we would like to have all the need-to-have goals completed and fully functioning. We plan to have made progress on the want-to-have goals by this time as well. By the end of the project, we plan to have most, if not all, of the want-to-have goals completed and the beginnings of progress of the dream goals.
