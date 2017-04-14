@@ -100,9 +100,19 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
   ```
 * Advise on use of float versus integer operations
   ```
-  let sum_float_list = List.fold_left ( + ) 0. ;;
+  let sum_list = List.fold_left ( + ) 0. ;;
 
-  let sum_float_list = List.fold_left ( +. ) 0. ;;
+  let sum_list = List.fold_left ( + ) 0 ;;
+
+  ========================================
+
+  let x = 1. ;;
+
+  let y = x + 1 ;;
+
+  let x = 1. ;;
+
+  let y = x +. 1. ;;
   ```
 ### Ideals
 In the most ideal case, the linter would not only be able to detect the above issues but also fix them automatically, like they were fixed manually above. We predict this would be a very hard problem, but if we accomplish our other goals, we would definitely like to tackle this one
