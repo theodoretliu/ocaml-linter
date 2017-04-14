@@ -40,6 +40,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
   assert (List.fold_left (fun x y -> x + y) 0 [1; 2; 3] = 6) ;;
   ```
 * Detect no spaces before semicolons or other operators
+
   ```ocaml
   let x=1+2;;
 
