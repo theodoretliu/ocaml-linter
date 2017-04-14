@@ -99,7 +99,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
   let is_sum_even l = (sum l) mod 2 = 0 ;;
   ```
 * Advise on use of float versus integer operations
-  ```
+  ```ocaml
   let sum_list = List.fold_left ( + ) 0. ;;
 
   let sum_list = List.fold_left ( + ) 0 ;;
