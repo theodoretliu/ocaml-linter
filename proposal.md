@@ -2,7 +2,7 @@
 Nenya Edjah, Theodore Liu, and Richard Wang
 
 ## Objective
-We would like to build a linter and/or autoformatter for OCaml. In general, the linter would detect for improper styling, including but not limited to going over the 80 character line limit, improper indentation, untyped variables in function declarations, and unnecessary semicolon uses. Additionally, the linter would also check for code "optimizations" including partially applied functions, match statements which could be converted to let statements, and converting if else statements into boolean expressions. Finally, as a stretch goal, our linter would be able to automatically make changes to the code, adjusting the style and other items as it determines is best.
+We would like to build a linter and/or autoformatter for OCaml. In general, the linter would detect for improper styling, including but not limited to going over the 80 character line limit, improper indentation, and untyped variables in top-level function declarations. Additionally, the linter would also check for code "optimizations" including partially applied functions, match statements which could be converted to let statements, and converting if else statements into boolean expressions. Finally, as a stretch goal, our linter would be able to automatically make changes to the code, adjusting the style and other items as it determines is best.
 
 ## Goals
 
@@ -78,7 +78,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
 
   let y = sum [1; 2; 3; 4] ;;
 
-  ========================================
+  
 
   let sum = List.fold_left ( + ) 0 
 
@@ -90,7 +90,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
 
   let is_sum_even l = (List.fold_left ( + ) 0 l) mod 2 = 0 ;;
 
-  ========================================
+  
 
   let sum = List.fold_left ( + ) 0 ;;
 
