@@ -72,18 +72,7 @@ We would like to build a linter and/or autoformatter for OCaml. In general, the 
     if x <= 0 || y <= 0 then false
     else x = y || f (x - 1) (y - 2) ;;
   ```
-* Detect unnecessary semicolon use
-  ```ocaml
-  let sum = List.fold_left ( + ) 0 ;;
 
-  let y = sum [1; 2; 3; 4] ;;
-
-  
-
-  let sum = List.fold_left ( + ) 0 
-
-  let y = sum [1; 2; 3; 4]
-  ```
 * Detect repeated code
   ```ocaml
   let is_sum_odd l = (List.fold_left ( + ) 0 l) mod 2 = 1 ;;
