@@ -15,6 +15,11 @@ type binop =
   | Minus
   | Times
   | Divide
+  | FPlus
+  | FMinus
+  | FTimes
+  | FDivide
+  | Exponent
   | Equals
   | LessThan
   | GreaterThan
@@ -30,8 +35,9 @@ type expr =
   | Binop of binop * expr * expr         (* binary operators *)
   | Conditional of expr * expr * expr    (* if then else *)
   | Fun of varid * expr                  (* function definitions *)
-  | Let of varid * expr * expr           (* local naming *)
-  | Letrec of varid * expr * expr        (* recursive local naming *)
+  | Let of varid * expr 
+  | LetIn of varid * expr * expr           (* local naming *)
+  | LetRec of varid * expr * expr        (* recursive local naming *)
   | Raise                                (* exceptions *)
   | Unassigned                           (* (temporarily) unassigned *)
   | App of expr * expr                   (* function applications *)

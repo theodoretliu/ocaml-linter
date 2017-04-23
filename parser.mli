@@ -11,6 +11,11 @@ type token =
   | MINUS
   | TIMES
   | DIVIDE
+  | FPLUS
+  | FMINUS
+  | FTIMES
+  | FDIVIDE
+  | EXPO
   | LESSTHAN
   | GREATERTHAN
   | LEQ
