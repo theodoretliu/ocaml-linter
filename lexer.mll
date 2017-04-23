@@ -48,16 +48,17 @@
 		     ]
 }
 
-let digit = ['0'-'9']
+let ints = ['0'-'9']
+let floats = (['0'-'9']+) '.' (['0'-'9']*)
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9']*
 let sym = ['(' ')'] | (['+' '-' '*' '/' '.' '=' '~' ';' '<' '>']+)
 
 rule token = parse
-  | "69.420" as fnum
+  | floats as fnum
     { let num = float_of_string fnum in
       FLOAT num
     }	
-  | digit+ as inum
+  | ints+ as inum
   	{ let num = int_of_string inum in
 	  INT num
 	}
