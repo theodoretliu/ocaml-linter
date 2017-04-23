@@ -41,7 +41,8 @@ exp:
 	| expnoapp		{ $1 }
 
 expnoapp: 
-	| INT							{ Num $1 }
+	| INT							{ Int $1 }
+	| FLOAT 						{ Float $1 }
 	| TRUE							{ Bool true }
 	| FALSE							{ Bool false }
 	| ID							{ Var $1 }
