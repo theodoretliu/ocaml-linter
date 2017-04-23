@@ -7,36 +7,30 @@
 (* Abstract syntax of MiniML expressions *)
 
 type unop =
-  | Negate
+  | IntUnop
+  | FloatUnop
 ;;
     
 type binop =
-  | Plus
-  | Minus
-  | Times
-  | Divide
-  | FPlus
-  | FMinus
-  | FTimes
-  | FDivide
-  | Exponent
-  | Equals
-  | LessThan
-  | GreaterThan
-  | LessThanEqual
-  | GreaterThanEqual
+  | IntUnop
+  | FloatUnop
+  | IntBinop
+  | FloatBinop
+  | CompareBinop
+  | BoolBinop
 ;;
       
 type expr =
   | Var of varid                         (* variables *)
-  | Num of int                           (* integers *)
+  | Int of int                           (* integers *)
+  | Float of float                       (* floats *)
   | Bool of bool                         (* booleans *)
   | Unop of unop * expr                  (* unary operators *)
   | Binop of binop * expr * expr         (* binary operators *)
   | Conditional of expr * expr * expr    (* if then else *)
   | Fun of varid * expr                  (* function definitions *)
-  | Let of varid * expr 
-  | LetIn of varid * expr * expr           (* local naming *)
+  | Let of varid * expr                  (* global naming *)
+  | LetIn of varid * expr * expr         (* local naming *)
   | LetRec of varid * expr * expr        (* recursive local naming *)
   | Raise                                (* exceptions *)
   | Unassigned                           (* (temporarily) unassigned *)

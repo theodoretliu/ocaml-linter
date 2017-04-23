@@ -6,21 +6,16 @@ type token =
   | DOT
   | IN
   | REC
-  | NEG
-  | PLUS
-  | MINUS
-  | TIMES
-  | DIVIDE
-  | FPLUS
-  | FMINUS
-  | FTIMES
-  | FDIVIDE
-  | EXPO
-  | LESSTHAN
-  | GREATERTHAN
-  | LEQ
-  | GEQ
   | EQUALS
+  | INTUNOP
+  | INTBINOP
+  | FLOATUNOP
+  | FLOATBINOP
+  | BOOLBINOP
+  | COMPAREBINOP
+  | CONS
+  | NIL
+  | APPEND
   | IF
   | THEN
   | ELSE

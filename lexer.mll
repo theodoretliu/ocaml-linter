@@ -18,46 +18,73 @@
 		       ("rec", REC);
 		       ("true", TRUE);
 		       ("false", FALSE);
-		       ("lambda", FUNCTION);
 		       ("fun", FUNCTION);
 		       ("function", FUNCTION)
 		     ]
 		     
   let sym_table = 
     create_hashtable 8 [
-		       ("=", EQUALS);
-		       ("<", LESSTHAN);
-		       (">", GREATERTHAN);
-		       ("<=", LEQ);
-		       (">=", GEQ);
-		       (".", DOT);
-		       ("->", DOT);
-		       (";;", EOF);
-		       ("~", NEG);
-		       ("+", PLUS);
-		       ("-", MINUS);
-		       ("*", TIMES);
-		       ("/", DIVIDE);
-		       ("+.", FPLUS);
-		       ("-.", FMINUS);
-		       ("*.", FTIMES);
-		       ("/.", FDIVIDE);
-		       ("**", EXPO);
+    		   (".",  DOT);
+    		   ("->", DOT);
+    		   (";;", EOF);
+
+		       ("=",  EQUALS);
+		       ("<>", COMPAREBINOP);
+		       ("==", COMPAREBINOP);
+		       ("!=", COMPAREBINOP);
+		       ("<",  COMPAREBINOP);
+		       (">",  COMPAREBINOP);
+		       ("<=", COMPAREBINOP);
+		       (">=", COMPAREBINOP);
+
+		       ("&&", BOOLBINOP);
+		       ("&",  BOOLBINOP);
+		       ("||", BOOLBINOP);
+		       ("or", BOOLBINOP);
+
+		       ("~",  INTUNOP);
+		       ("~+", INTUNOP);
+		       ("~-", INTUNOP);
+
+		       ("+", INTBINOP);
+		       ("-", INTBINOP);
+		       ("*", INTBINOP);
+		       ("/", INTBINOP);
+
+		       ("mod",  INTBINOP);
+		       ("land", INTBINOP);
+		       ("lor",  INTBINOP);
+		       ("lxor", INTBINOP);
+		       ("lsl",  INTBINOP);
+		       ("lsr",  INTBINOP);
+		       ("asr",  INTBINOP);
+
+
+		       ("~-.", FLOATUNOP);
+		       ("~+.", FLOATUNOP);
+		       ("~-.", FLOATUNOP);
+
+		       ("+.", FLOATBINOP);
+		       ("-.", FLOATBINOP);
+		       ("*.", FLOATBINOP);
+		       ("/.", FLOATBINOP);
+		       ("**", FLOATBINOP);
+
 		       ("(", OPEN);
 		       (")", CLOSE)
 		     ]
 }
 
-let digit = ['0'-'9']
+let digits = ['0'-'9']
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9']*
 let sym = ['(' ')'] | (['+' '-' '*' '/' '.' '=' '~' ';' '<' '>']+)
 
 rule token = parse
-  | '@' as fnum
-    { let num = float_of_string "1.34" in
+  | (digits+) '.' (digits*) as fnum
+    { let num = float_of_string fnum in
       FLOAT num
-    }
-  | digit+ as inum
+    }	
+  | digits+ as inum
   	{ let num = int_of_string inum in
 	  INT num
 	}
