@@ -53,10 +53,10 @@ let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9']*
 let sym = ['(' ')'] | (['+' '-' '*' '/' '.' '=' '~' ';' '<' '>']+)
 
 rule token = parse
-  | "69.420" as fnum
-    { let num = float_of_string fnum in
+  | '@' as fnum
+    { let num = float_of_string "1.34" in
       FLOAT num
-    }	
+    }
   | digit+ as inum
   	{ let num = int_of_string inum in
 	  INT num
