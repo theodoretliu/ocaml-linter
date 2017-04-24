@@ -1,7 +1,7 @@
 (* 
-			 CS 51 Final Project
-			MiniML -- Expressions
-			     Spring 2017
+       CS 51 Final Project
+      MiniML -- Expressions
+           Spring 2017
 *)
 
 (* Abstract syntax of MiniML expressions *)
@@ -42,9 +42,9 @@ type expr =
   
 (* Sets of varids *)
 module SS = Set.Make (struct
-		       type t = varid
-		       let compare = String.compare
-		     end ) ;;
+           type t = varid
+           let compare = String.compare
+         end ) ;;
 
 type varidset = SS.t ;;
 

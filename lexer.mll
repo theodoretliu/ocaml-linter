@@ -14,113 +14,107 @@
 
   let keyword_table = 
     create_hashtable 8 [
-		       ("if", IF);
-		       ("in", IN);
-		       ("then", THEN);
-		       ("else", ELSE);
-		       ("let", LET);
-		       ("raise", RAISE);
-		       ("rec", REC);
-		       ("true", TRUE);
-		       ("false", FALSE);
-		       ("fun", FUNCTION);
-		       ("function", FUNCTION)
-		     ]
-		     
+               ("if", IF);
+               ("in", IN);
+               ("then", THEN);
+               ("else", ELSE);
+               ("let", LET);
+               ("raise", RAISE);
+               ("rec", REC);
+               ("true", TRUE);
+               ("false", FALSE);
+               ("fun", FUNCTION);
+               ("function", FUNCTION)
+             ]
+             
   let sym_table = 
     create_hashtable 8 [
-    		   (".",  DOT);
-    		   ("->", DOT);
-    		   (";;", EOF);
+               (".",  DOT);
+               ("->", DOT);
+               (";;", EOF);
 
-		       ("=",  EQUALS);
-		       ("<>", COMPAREBINOP);
-		       ("==", COMPAREBINOP);
-		       ("!=", COMPAREBINOP);
-		       ("<",  COMPAREBINOP);
-		       (">",  COMPAREBINOP);
-		       ("<=", COMPAREBINOP);
-		       (">=", COMPAREBINOP);
+               ("=",  EQUALS);
+               ("<>", COMPAREBINOP);
+               ("==", COMPAREBINOP);
+               ("!=", COMPAREBINOP);
+               ("<",  COMPAREBINOP);
+               (">",  COMPAREBINOP);
+               ("<=", COMPAREBINOP);
+               (">=", COMPAREBINOP);
 
-		       ("&&", BOOLBINOP);
-		       ("&",  BOOLBINOP);
-		       ("||", BOOLBINOP);
-		       ("or", BOOLBINOP);
+               ("&&", BOOLBINOP);
+               ("&",  BOOLBINOP);
+               ("||", BOOLBINOP);
+               ("or", BOOLBINOP);
 
-		       ("~",  INTUNOP);
-		       ("~+", INTUNOP);
-		       ("~-", INTUNOP);
+               ("~",  INTUNOP);
+               ("~+", INTUNOP);
+               ("~-", INTUNOP);
 
-		       ("+", INTBINOP);
-		       ("-", INTBINOP);
-		       ("*", INTBINOP);
-		       ("/", INTBINOP);
+               ("+", INTBINOP);
+               ("-", INTBINOP);
+               ("*", INTBINOP);
+               ("/", INTBINOP);
 
-		       ("mod",  INTBINOP);
-		       ("land", INTBINOP);
-		       ("lor",  INTBINOP);
-		       ("lxor", INTBINOP);
-		       ("lsl",  INTBINOP);
-		       ("lsr",  INTBINOP);
-		       ("asr",  INTBINOP);
+               ("mod",  INTBINOP);
+               ("land", INTBINOP);
+               ("lor",  INTBINOP);
+               ("lxor", INTBINOP);
+               ("lsl",  INTBINOP);
+               ("lsr",  INTBINOP);
+               ("asr",  INTBINOP);
 
 
-		       ("~-.", FLOATUNOP);
-		       ("~+.", FLOATUNOP);
-		       ("~-.", FLOATUNOP);
+               ("~-.", FLOATUNOP);
+               ("~+.", FLOATUNOP);
+               ("~-.", FLOATUNOP);
 
-		       ("+.", FLOATBINOP);
-		       ("-.", FLOATBINOP);
-		       ("*.", FLOATBINOP);
-		       ("/.", FLOATBINOP);
-		       ("**", FLOATBINOP);
+               ("+.", FLOATBINOP);
+               ("-.", FLOATBINOP);
+               ("*.", FLOATBINOP);
+               ("/.", FLOATBINOP);
+               ("**", FLOATBINOP);
 
-		       ("(", OPEN);
-		       (")", CLOSE)
-		     ]
+               ("(", OPEN);
+               (")", CLOSE)
+             ]
 }
 
 let digits = ['0'-'9']
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9']*
 let sym = ['(' ')'] | (['+' '-' '*' '/' '.' '=' '~' ';' '<' '>']+)
-let lists = '[' _* ']'
 
 rule token = parse
-  | lists as lst
-    { let rec aux lst =
-        match lst with
-        | h::t -> [CONS; h] @ (aux t)
-        | [] -> [NIL]
-      in aux (List.map token (split_on_char lst ";"))
-    }
-    
+  | '[' { LISTOPEN }
+  | ']' { LISTCLOSE }
+  | ';' { DELIMITER }
   | (digits+) '.' (digits*) as fnum
     { let num = float_of_string fnum in
       FLOAT num
-    }	
+    }   
   | digits+ as inum
-  	{ let num = int_of_string inum in
-	    INT num
-	  }
+    { let num = int_of_string inum in
+        INT num
+      }
   | id as word
-  	{ try
-	      let token = Hashtbl.find keyword_table word in
-	      token 
-	    with Not_found ->
-	      ID word
-	  }
+    { try
+          let token = Hashtbl.find keyword_table word in
+          token 
+        with Not_found ->
+          ID word
+      }
   | sym as symbol
-  	{ try
-  	    let token = Hashtbl.find sym_table symbol in
-  	    token
-  	  with Not_found ->
-  	    token lexbuf
-  	}
-  | '{' [^ '\n']* '}'	{ token lexbuf }    (* skip one-line comments *)
-  | [' ' '\t' '\n']	{ token lexbuf }    (* skip whitespace *)
+    { try
+        let token = Hashtbl.find sym_table symbol in
+        token
+      with Not_found ->
+        token lexbuf
+    }
+  | '{' [^ '\n']* '}'   { token lexbuf }    (* skip one-line comments *)
+  | [' ' '\t' '\n'] { token lexbuf }    (* skip whitespace *)
   | _ as c                                  (* warn and skip unrecognized characters *)
-  	{ printf "Unrecognized character: %c\n" c;
-	  token lexbuf
-	  }
+    { printf "Unrecognized character: %c\n" c;
+      token lexbuf
+    }
   | eof
         { raise End_of_file }
