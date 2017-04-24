@@ -36,6 +36,8 @@ type expr =
   | Raise                                (* exceptions *)
   | Unassigned                           (* (temporarily) unassigned *)
   | App of expr * expr                   (* function applications *)
+  | Cons of expr * expr                  (* lists *)
+  | Nil
  and varid = string ;;
   
 (* Sets of varids *)

@@ -17,6 +17,8 @@
 %token <int> INT
 %token <float> FLOAT
 %token TRUE FALSE
+%token CONS
+%token NIL
 
 %nonassoc COMPAREBINOP
 %left INTBINOP FLOATBINOP
@@ -55,6 +57,8 @@ expnoapp:
 	| FUNCTION ID DOT exp			{ Fun($2, $4) }	
 	| RAISE							{ Raise }
 	| OPEN exp CLOSE				{ $2 }
+	| CONS exp exp  	           	{ Cons($2, $3) }
+	| NIL							{ Nil }
 ;
 
 %%

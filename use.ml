@@ -1,3 +1,4 @@
+#load "str.cma" ;;
 #mod_use "expr.ml" ;;
 #mod_use "parser.ml" ;;
 #mod_use "lexer.ml" ;;
