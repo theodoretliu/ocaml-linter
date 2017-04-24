@@ -7,8 +7,8 @@ module MP = Parser ;;
 module ML = Lexer ;;
 
 let test str =
-	let lexbuf = Lexing.from_string str in
-	MP.input ML.token lexbuf ;;
+  let lexbuf = Lexing.from_string str in
+  MP.input ML.token lexbuf ;;
 
 (* ocamlyacc parser.mly *)
 (* ocamllex lexer.mli *)
