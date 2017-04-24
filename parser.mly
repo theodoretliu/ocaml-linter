@@ -18,6 +18,7 @@
 %token <float> FLOAT
 %token TRUE FALSE
 %token CONS
+%token LIST
 %token NIL
 
 %nonassoc COMPAREBINOP

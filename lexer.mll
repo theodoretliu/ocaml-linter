@@ -86,14 +86,6 @@ let sym = ['(' ')'] | (['+' '-' '*' '/' '.' '=' '~' ';' '<' '>']+)
 let lists = '[' _* ']'
 
 rule token = parse
-  | lists as lst
-    { let rec aux lst =
-        match lst with
-        | h::t -> [CONS; h] @ (aux t)
-        | [] -> [NIL]
-      in aux (List.map token (split_on_char lst ";"))
-    }
-    
   | (digits+) '.' (digits*) as fnum
     { let num = float_of_string fnum in
       FLOAT num
