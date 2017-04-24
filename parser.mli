@@ -32,6 +32,8 @@ type token =
   | FLOAT of (float)
   | TRUE
   | FALSE
+  | CONS
+  | NIL
 
 val input :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Expr.expr
