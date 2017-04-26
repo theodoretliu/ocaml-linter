@@ -89,6 +89,7 @@ document.getElementById('parse-input').addEventListener('keyup', function(e) {
 document.getElementById('parse-button').addEventListener('click', function() {
 	var input = document.getElementById('parse-input').value;
 	var result = parseAST(input);
+	document.getElementById('parse-input').value = '';
 	document.getElementById('graph').innerHTML = '';
 	resetTree();
 	if (result) {
