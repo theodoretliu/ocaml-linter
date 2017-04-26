@@ -147,6 +147,7 @@ submit.addEventListener('click', function() {
 		console.log("Width: " + width)
 		console.log("Depth: " + depth);
 		console.log(result);
+		width = Math.max(width, depth/2);
 		setupTree(result, 360 + 180*depth, 140 + 100*width);
 	} else {
 		setupTree({"name": "ERROR. Cannot understand your input"}, 960, 500);
