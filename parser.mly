@@ -6,9 +6,9 @@
 %token OPEN CLOSE
 %token LET DOT IN REC
 %token EQUALS
-%token INTUNOP INTBINOP
-%token FLOATUNOP FLOATBINOP
 %token BOOLBINOP COMPAREBINOP
+%token INTBINOP FLOATBINOP
+%token INTUNOP FLOATUNOP
 %token CONS NIL APPEND
 %token IF THEN ELSE 
 %token FUNCTION
@@ -20,7 +20,8 @@
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
 %nonassoc COMPAREBINOP
-%left INTBINOP FLOATBINOP
+
+%right INTBINOP FLOATBINOP
 
 %start input
 %type <Expr.expr> input
@@ -39,14 +40,16 @@ expnoapp:
 	| TRUE							{ Bool true }
 	| FALSE							{ Bool false }
 	| ID							{ Var $1 }
+
+	| INTUNOP exp   				{ Unop(IntUnop, $2) }
+	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
+
 	| exp INTBINOP exp				{ Binop(IntBinop, $1, $3) }
 	| exp FLOATBINOP exp			{ Binop(FloatBinop, $1, $3) }
 	| exp EQUALS exp 				{ Binop(CompareBinop, $1, $3) }
 	| exp COMPAREBINOP exp			{ Binop(CompareBinop, $1, $3) }
 	| exp BOOLBINOP exp 			{ Binop(BoolBinop, $1, $3) }
 
-	| INTUNOP exp   				{ Unop(IntUnop, $2) }
-	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
 
 	| IF exp THEN exp ELSE exp   	{ Conditional($2, $4, $6) }
 	| LET ID EQUALS exp 			{ Let($2, $4) }

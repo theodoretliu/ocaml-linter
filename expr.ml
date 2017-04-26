@@ -9,11 +9,10 @@
 type unop =
   | IntUnop
   | FloatUnop
+  | BoolUnop
 ;;
     
 type binop =
-  | IntUnop
-  | FloatUnop
   | IntBinop
   | FloatBinop
   | CompareBinop
