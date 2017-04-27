@@ -98,10 +98,16 @@ let escape_sequence = '\\'['\\' '"' '\'' 'n' 't' 'b' 'r' ' ']
 let regular_char = _
 
 rule token = parse
-  | ('-')? ['0'-'9'] ['0'-'9' '_']* as integer_literal 
+  | ('-')? ((['0'-'9'] ['0'-'9' '_']*)
+         | ('0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f'] ['0'-'9' 'A'-'F' 'a'-'f' '_']*)
+         | ('0' ['o' 'O'] ['0'-'7'] ['0'-'7' '_']*)
+         | ('0' ['b' 'B'] ['0'-'1'] ['0'-'1' '_']*)) as integer_literal
     {
       INT (int_of_string integer_literal)
     }
+  | ('-')? ['0'-'9'] ['0'-'9' '_']* ('.' ['0'-'9' '_']*)? (['e' 'E'] ['+' '-'] ['0'-'9'] ['0'-'9' '_']*)? as float_literal
+    {
+      FLOAT (float_of_string float_literal)
   | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident (* capitalized ident *)
     {
       ID ident
