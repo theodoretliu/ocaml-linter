@@ -3,6 +3,7 @@
 %}
 
 %token <string> INFIX
+%token <string> PREFIX
 %token EOF
 %token OPEN CLOSE
 %token LET DOT IN REC
@@ -21,11 +22,8 @@
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
-<<<<<<< HEAD
-=======
 %token MATCH WITH
 %token SEMICOLON
->>>>>>> b7311b870e3ab5a775088ef27c3f2bb000a6f572
 %nonassoc COMPAREBINOP
 
 %right INTBINOP FLOATBINOP
@@ -47,11 +45,8 @@ expnoapp:
 	| TRUE							{ Bool true }
 	| FALSE							{ Bool false }
 	| ID							{ Var $1 }
-<<<<<<< HEAD
 	| FLOATUNOP x=exp*				{ Unop(FloatUnop, Int (List.length x)) }
-=======
 	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
->>>>>>> b7311b870e3ab5a775088ef27c3f2bb000a6f572
 
 	| exp INTBINOP exp				{ Binop(IntBinop, $1, $3) }
 	| exp FLOATBINOP exp			{ Binop(FloatBinop, $1, $3) }
