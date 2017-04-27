@@ -85,9 +85,13 @@ let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 let sym = ['(' ')'] | (['+' '*' '/' '.' '=' '~' ';' '<' '>']+)
 
 rule token = parse
-  | ('-')? ['0'-'9'] ['0'-'9' '_']* as integer_literal
+  | ('-')? ['0'-'9'] ['0'-'9' '_']* as integer_literal 
     {
       INT (int_of_string integer_literal)
+    }
+  | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident (* capitalized ident *)
+    {
+      IDENT ident
     }
   | id as word
     { try
