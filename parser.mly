@@ -28,18 +28,22 @@
 %token SEMICOLON
 %token PIPE
 %token UNIT
+%token END
 
 %nonassoc COMPAREBINOP
 
-%left SEMICOLON
 %right INTBINOP FLOATBINOP
 
 %start input
-%type <Expr.expr> input
+%type <Expr.expr list> input
 
 /* Grammar follows */
 %%
-input:  exp EOF         { $1 }
+treeexp:
+  | exp EOF treeexp      { $1 :: $3 }
+  | exp                  { [$1] }
+
+input:  treeexp END         { $1 }
 
 exp: 
   | exp expnoapp  { App ($1, $2) }
