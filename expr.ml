@@ -37,6 +37,7 @@ type expr =
   | App of expr * expr                   (* function applications *)
   | Cons of expr * expr                  (* lists *)
   | Nil
+  | Char of char
  and varid = string ;;
   
 (* Sets of varids *)

@@ -84,6 +84,12 @@ let letter = ['a'-'z' 'A'-'Z']
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 let sym = ['(' ')'] | (['+' '*' '/' '.' '=' '~' ';' '<' '>']+)
 
+let hex = ['0'-'9' 'A'-'F' 'a'-'f']
+let escape_sequence = '\\'['\\' '"' '\'' 'n' 't' 'b' 'r' ' '] 
+                      | '\\'['0'-'9']['0'-'9']['0'-'9']
+                      | '\\' 'x' hex hex hex
+let regular_char = _
+
 rule token = parse
   | ('-')? ['0'-'9'] ['0'-'9' '_']* as integer_literal 
     {
@@ -92,6 +98,10 @@ rule token = parse
   | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident (* capitalized ident *)
     {
       IDENT ident
+    }
+  | '\''(regular_char | escape_sequence)'\'' as char_literal
+    {
+      CHAR (String.get char_literal 1)
     }
   | id as word
     { try
