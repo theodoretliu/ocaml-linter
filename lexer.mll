@@ -80,22 +80,15 @@
              ]
 }
 
-let digits = ['0'-'9']
+let letter = ['a'-'z' 'A'-'Z']
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
-let sym = ['(' ')'] | (['+' '-' '*' '/' '.' '=' '~' ';' '<' '>']+)
+let sym = ['(' ')'] | (['+' '*' '/' '.' '=' '~' ';' '<' '>']+)
 
 rule token = parse
-  | '[' { LISTOPEN }
-  | ']' { LISTCLOSE }
-  | ';' { DELIMITER }
-  | (digits+) '.' (digits*) as fnum
-    { let num = float_of_string fnum in
-      FLOAT num
-    }   
-  | digits+ as inum
-    { let num = int_of_string inum in
-        INT num
-      }
+  | ('-')? ['0'-'9'] ['0'-'9' '_']* as integer_literal
+    {
+      INT (int_of_string integer_literal)
+    }
   | id as word
     { try
           let token = Hashtbl.find keyword_table word in
