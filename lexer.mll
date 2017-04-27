@@ -49,8 +49,8 @@
                ("=", EQUALS);
                ("::", CONS);
                (";;..", END);
-               
 
+               
                ("(", OPEN);
                (")", CLOSE);
                (";", SEMICOLON);
