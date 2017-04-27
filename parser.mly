@@ -2,6 +2,7 @@
   open Expr ;;
 %}
 
+%token <string> INFIX
 %token EOF
 %token OPEN CLOSE
 %token LET DOT IN REC
@@ -16,9 +17,11 @@
 %token <string> ID
 %token <int> INT
 %token <float> FLOAT
+%token <char> CHAR
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
+%token CHAR
 %nonassoc COMPAREBINOP
 
 %right INTBINOP FLOATBINOP
@@ -35,13 +38,14 @@ exp:
 	| expnoapp		{ $1 }
 
 expnoapp: 
-	| INT							{ Int $1 }
+	| INT							{ if $1 = 4 then Int $1 else Int 5 }
 	| FLOAT 						{ Float $1 }
 	| TRUE							{ Bool true }
 	| FALSE							{ Bool false }
 	| ID							{ Var $1 }
 
-	| INTUNOP exp   				{ Unop(IntUnop, $2) }
+	| OP exp   				{ match $1 with
+						      | "~-" -> Unop(IntUnop, $2) }
 	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
 
 	| exp INTBINOP exp				{ Binop(IntBinop, $1, $3) }
@@ -63,5 +67,6 @@ expnoapp:
 	| LISTOPEN exp        			{ $2 }
 	| exp DELIMITER exp 			{ Cons($1, $3) }
 	| exp LISTCLOSE 				{ Cons($1, Nil) }
+	| CHAR 							{ Char $1}
 
 %%
