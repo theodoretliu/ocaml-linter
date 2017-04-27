@@ -39,6 +39,7 @@
 
 /* Grammar follows */
 %%
+
 input:  exp EOF         { $1 }
 
 exp: 
@@ -54,6 +55,7 @@ listexp:
   | exp SEMICOLON listexp { $1 :: $3 }
   | exp                   { [$1] }
   |                       { [] }
+
 
 expnoapp:
   | ID                                { Var $1 }
@@ -74,12 +76,6 @@ expnoapp:
   | LET ID EQUALS exp IN exp      { LetIn ($2, $4, $6) }
   | LET REC ID EQUALS exp         { LetRec ($3, $5) }
   | LET REC ID EQUALS exp IN exp  { LetRecIn ($3, $5, $7) }
-  | IF exp THEN exp x=option(pair(ELSE, exp)) 
-      { let el = 
-          match x with
-          | None -> None
-          | Some (_, b) -> Some b in
-        Conditional ($2, $4, el) }
   | exp INFIX exp                      { Infix ($2, $1, $3) }
 
 %%
