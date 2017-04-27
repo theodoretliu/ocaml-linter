@@ -16,9 +16,11 @@
 %token <string> ID
 %token <int> INT
 %token <float> FLOAT
+%token <char> CHAR
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
+%token CHAR
 %nonassoc COMPAREBINOP
 
 %right INTBINOP FLOATBINOP
@@ -63,5 +65,6 @@ expnoapp:
 	| LISTOPEN exp        			{ $2 }
 	| exp DELIMITER exp 			{ Cons($1, $3) }
 	| exp LISTCLOSE 				{ Cons($1, Nil) }
+	| CHAR 							{ Char $1}
 
 %%
