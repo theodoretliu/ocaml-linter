@@ -24,7 +24,11 @@
                ("true", TRUE);
                ("false", FALSE);
                ("fun", FUNCTION);
-               ("function", FUNCTION)
+               ("function", FUNCTION);
+               ("begin", OPEN);
+               ("end", CLOSE);
+               ("match", MATCH);
+               ("with", WITH);
              ]
              
   let sym_table = 
@@ -76,7 +80,10 @@
                ("**", FLOATBINOP);
 
                ("(", OPEN);
-               (")", CLOSE)
+               (")", CLOSE);
+
+               (";", SEMICOLON);
+
              ]
 }
 
@@ -97,7 +104,7 @@ rule token = parse
     }
   | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident (* capitalized ident *)
     {
-      IDENT ident
+      ID ident
     }
   | '\''(regular_char | escape_sequence)'\'' as char_literal
     {

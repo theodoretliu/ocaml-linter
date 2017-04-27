@@ -21,7 +21,8 @@
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
-%token CHAR
+%token MATCH WITH
+%token SEMICOLON
 %nonassoc COMPAREBINOP
 
 %right INTBINOP FLOATBINOP
@@ -43,9 +44,6 @@ expnoapp:
 	| TRUE							{ Bool true }
 	| FALSE							{ Bool false }
 	| ID							{ Var $1 }
-
-	| OP exp   				{ match $1 with
-						      | "~-" -> Unop(IntUnop, $2) }
 	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
 
 	| exp INTBINOP exp				{ Binop(IntBinop, $1, $3) }
