@@ -70,6 +70,7 @@ expnoapp:
   | OPENBRACKET CLOSEBRACKET          { Nil }
   | exp CONS exp                      { Cons ($1, $3) }
   | PREFIX exp                        { Prefix ($1, $2) }
+  | exp INFIX exp                      { Infix ($2, $1, $3) }
   | LET ID EQUALS exp             { Let ($2, $4) }
   | LET ID EQUALS exp IN exp      { LetIn ($2, $4, $6) }
   | LET REC ID EQUALS exp         { LetRec ($3, $5) }
@@ -80,6 +81,6 @@ expnoapp:
           | None -> None
           | Some (_, b) -> Some b in
         Conditional ($2, $4, el) }
-  | exp INFIX exp                      { Infix ($2, $1, $3) }
+ 
 
 %%

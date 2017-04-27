@@ -122,7 +122,7 @@ rule token = parse
         let token = Hashtbl.find sym_table (String.make 1 symbol) in
         token
       with Not_found ->
-        token lexbuf
+        INFIX (String.make 1 symbol)
     }
   | infix_symbol operator_char* as infix_op
     {
