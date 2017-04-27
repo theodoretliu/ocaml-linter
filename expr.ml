@@ -38,6 +38,7 @@ type expr =
   | Cons of expr * expr                  (* lists *)
   | Nil
   | Char of char
+  | String of string
  and varid = string ;;
   
 (* Sets of varids *)

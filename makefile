@@ -1,4 +1,7 @@
-all: linter
+all: use linter
+
+use: use.ml
+	ocamlbuild use.byte
 
 linter: linter.ml
 	ocamlbuild linter.byte
