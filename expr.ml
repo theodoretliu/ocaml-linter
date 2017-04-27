@@ -26,7 +26,7 @@ type expr =
   | Bool of bool                         (* booleans *)
   | Unop of unop * expr                  (* unary operators *)
   | Binop of binop * expr * expr         (* binary operators *)
-  | Conditional of expr * expr * expr    (* if then else *)
+  | Conditional of expr * expr * expr option    (* if then else *)
   | Fun of varid * expr                  (* function definitions *)
   | Let of varid * expr                  (* global naming *)
   | LetIn of varid * expr * expr         (* local naming *)
@@ -39,6 +39,9 @@ type expr =
   | Nil
   | Char of char
   | String of string
+  | Prefix of string * expr
+  | Infix of string * expr * expr
+  | Unit
  and varid = string ;;
   
 (* Sets of varids *)

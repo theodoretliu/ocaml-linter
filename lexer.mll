@@ -29,13 +29,6 @@
                ("end", CLOSE);
                ("match", MATCH);
                ("with", WITH);
-             ]
-             
-  let sym_table = 
-    create_hashtable 8 [
-               (".",  DOT);
-               ("->", DOT);
-               (";;", EOF);
 
                (* explicit infix operators *)
                ("or", INFIX "or");
@@ -46,6 +39,17 @@
                ("lsl",  INFIX "lsl");
                ("lsr",  INFIX "lsr");
                ("asr",  INFIX "asr");
+             ]
+             
+  let sym_table = 
+    create_hashtable 8 [
+               (".",  DOT);
+               ("->", DOT);
+               (";;", EOF);
+               ("=", EQUALS);
+               ("::", CONS);
+               
+               
 
                ("(", OPEN);
                (")", CLOSE);
@@ -62,7 +66,7 @@ let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
 let sym = ['(' ')' '+' '*' '/' '.' '=' '~' ';' '<' '>' '[' ']']
 
-let two_sym = "->" | ";;"
+let two_sym = "->" | ";;" | "::"
 
 let hex = ['0'-'9' 'A'-'F' 'a'-'f']
 
@@ -77,6 +81,14 @@ let operator_char = ['!' '$' '%' '&' '*' '+' '-' '.' '/' ':' '<' '=' '>' '?' '@'
 let infix_symbol = ['=' '<' '>' '@' '^' '|' '&' '+' '-' '*' '/' '$' '%']
 
 rule token = parse
+  | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident
+    {
+      try 
+        let token = Hashtbl.find keyword_table ident in
+        token
+      with Not_found ->
+        ID ident
+    }
   | ('-')? ((['0'-'9'] ['0'-'9' '_']*)
          | ('0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f'] ['0'-'9' 'A'-'F' 'a'-'f' '_']*)
          | ('0' ['o' 'O'] ['0'-'7'] ['0'-'7' '_']*)
@@ -89,10 +101,7 @@ rule token = parse
       FLOAT (float_of_string float_literal)
     }
   (* capitalized ident *)
-  | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident
-    {
-      ID ident
-    }
+  
   | '\''(regular_char | escape_sequence)'\'' as char_literal
     {
       CHAR (String.get char_literal 1)
