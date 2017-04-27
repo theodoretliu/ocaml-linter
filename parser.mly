@@ -21,7 +21,6 @@
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
-%token CHAR
 %nonassoc COMPAREBINOP
 
 %right INTBINOP FLOATBINOP
@@ -43,10 +42,7 @@ expnoapp:
 	| TRUE							{ Bool true }
 	| FALSE							{ Bool false }
 	| ID							{ Var $1 }
-
-	| OP exp   				{ match $1 with
-						      | "~-" -> Unop(IntUnop, $2) }
-	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
+	| FLOATUNOP x=exp*				{ Unop(FloatUnop, Int (List.length x)) }
 
 	| exp INTBINOP exp				{ Binop(IntBinop, $1, $3) }
 	| exp FLOATBINOP exp			{ Binop(FloatBinop, $1, $3) }

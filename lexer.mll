@@ -24,7 +24,7 @@
                ("true", TRUE);
                ("false", FALSE);
                ("fun", FUNCTION);
-               ("function", FUNCTION)
+               ("function", FUNCTION);
              ]
              
   let sym_table = 
@@ -33,62 +33,38 @@
                ("->", DOT);
                (";;", EOF);
 
-               ("=",  EQUALS);
-               ("<>", COMPAREBINOP);
-               ("==", COMPAREBINOP);
-               ("!=", COMPAREBINOP);
-               ("<",  COMPAREBINOP);
-               (">",  COMPAREBINOP);
-               ("<=", COMPAREBINOP);
-               (">=", COMPAREBINOP);
-
-               ("&&", BOOLBINOP);
-               ("&",  BOOLBINOP);
-               ("||", BOOLBINOP);
-               ("or", BOOLBINOP);
-
-               ("~",  INTUNOP);
-               ("~+", INTUNOP);
-               ("~-", INTUNOP);
-
-               ("+", INTBINOP);
-               ("-", INTBINOP);
-               ("*", INTBINOP);
-               ("/", INTBINOP);
-
-               ("mod",  INTBINOP);
-               ("land", INTBINOP);
-               ("lor",  INTBINOP);
-               ("lxor", INTBINOP);
-               ("lsl",  INTBINOP);
-               ("lsr",  INTBINOP);
-               ("asr",  INTBINOP);
-
-
-               ("~-.", FLOATUNOP);
-               ("~+.", FLOATUNOP);
-               ("~-.", FLOATUNOP);
-
-               ("+.", FLOATBINOP);
-               ("-.", FLOATBINOP);
-               ("*.", FLOATBINOP);
-               ("/.", FLOATBINOP);
-               ("**", FLOATBINOP);
+               (* explicit infix operators *)
+               ("or", INFIX);
+               ("mod",  INFIX);
+               ("land", INFIX);
+               ("lor",  INFIX);
+               ("lxor", INFIX);
+               ("lsl",  INFIX);
+               ("lsr",  INFIX);
+               ("asr",  INFIX);
 
                ("(", OPEN);
-               (")", CLOSE)
+               (")", CLOSE);
              ]
 }
 
 let letter = ['a'-'z' 'A'-'Z']
+
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
+
 let sym = ['(' ')'] | (['+' '*' '/' '.' '=' '~' ';' '<' '>']+)
 
 let hex = ['0'-'9' 'A'-'F' 'a'-'f']
+
 let escape_sequence = '\\'['\\' '"' '\'' 'n' 't' 'b' 'r' ' '] 
                       | '\\'['0'-'9']['0'-'9']['0'-'9']
                       | '\\' 'x' hex hex hex
+
 let regular_char = _
+
+let operator_char = ['!' '$' '%' '&' '*' '+' '-' '.' '/' ':' '<' '=' '>' '?' '@' '^' '|' '~']
+
+let infix_symbol = ['=' '<' '>' '@' '^' '|' '&' '+' '-' '*' '/' '$' '%']
 
 rule token = parse
   | ('-')? ((['0'-'9'] ['0'-'9' '_']*)
@@ -101,13 +77,23 @@ rule token = parse
   | ('-')? ['0'-'9'] ['0'-'9' '_']* ('.' ['0'-'9' '_']*)? (['e' 'E'] ['+' '-'] ['0'-'9'] ['0'-'9' '_']*)? as float_literal
     {
       FLOAT (float_of_string float_literal)
-  | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident (* capitalized ident *)
+    }
+  (* capitalized ident *)
+  | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident
     {
       IDENT ident
     }
   | '\''(regular_char | escape_sequence)'\'' as char_literal
     {
       CHAR (String.get char_literal 1)
+    }
+  | infix_symbol operator_char* as infix_op
+    {
+      INFIX infix_op
+    }
+  | ('!' operator_char*) | (['?' '~'] operator_char+) as prefix_op
+    {
+      PREFIX prefix_op
     }
   | id as word
     { try
