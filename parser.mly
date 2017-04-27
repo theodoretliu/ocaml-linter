@@ -6,6 +6,7 @@
 %token <string> PREFIX
 %token EOF
 %token OPEN CLOSE
+%token OPENBRACKET CLOSEBRACKET
 %token LET DOT IN REC
 %token EQUALS
 %token BOOLBINOP COMPAREBINOP
@@ -18,12 +19,14 @@
 %token <string> ID
 %token <int> INT
 %token <float> FLOAT
+%token <string> STRING
 %token <char> CHAR
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
 %token MATCH WITH
 %token SEMICOLON
+%token PIPE
 %nonassoc COMPAREBINOP
 
 %right INTBINOP FLOATBINOP
@@ -39,15 +42,27 @@ exp:
 	| exp expnoapp  { App($1, $2) }
 	| expnoapp		{ $1 }
 
-expnoapp: 
-	| INT							{ if $1 = 4 then Int $1 else Int 5 }
+/*
+need:
+typed expressions
+generalized tuple
+*/
+expnoapp:
+	| INT 							{ Int $1 }
+	| FLOAT 						{ Float $1 }
+	| STRING						{ String $1 }
+	| CHAR 							{ Char $1 }
+	| OPEN exp CLOSE 				{ $2 }
+	| OPENBRACKET x=separated_nonempty_list(SEMICOLON, exp) option(SEMICOLON) CLOSEBRACKET { List.fold_right (fun x y -> Cons(x, y)) x Nil }
+	| OPENBRACKET CLOSEBRACKET 		{ Nil }
+	| exp CONS exp 					{ Cons($1, $3) }
 	| FLOAT 						{ Float $1 }
 	| TRUE							{ Bool true }
 	| FALSE							{ Bool false }
 	| ID							{ Var $1 }
-	| FLOATUNOP x=exp*				{ Unop(FloatUnop, Int (List.length x)) }
 	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
 
+	| FLOATUNOP exp 				{ Unop(FloatUnop, $2) }
 	| exp INTBINOP exp				{ Binop(IntBinop, $1, $3) }
 	| exp FLOATBINOP exp			{ Binop(FloatBinop, $1, $3) }
 	| exp EQUALS exp 				{ Binop(CompareBinop, $1, $3) }
