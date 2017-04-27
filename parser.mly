@@ -39,16 +39,11 @@
 
 /* Grammar follows */
 %%
-<<<<<<< HEAD
 treeexp:
   | exp EOF treeexp      { $1 :: $3 }
   | exp                  { [$1] }
 
 input:  treeexp END         { $1 }
-=======
-
-input:  exp EOF         { $1 }
->>>>>>> 3b6bc9923187f52c9c6a0e9308cceec91e2a739b
 
 exp: 
   | exp expnoapp  { App ($1, $2) }
