@@ -38,18 +38,21 @@
                (";;", EOF);
 
                (* explicit infix operators *)
-               ("or", INFIX);
-               ("mod",  INFIX);
-               ("land", INFIX);
-               ("lor",  INFIX);
-               ("lxor", INFIX);
-               ("lsl",  INFIX);
-               ("lsr",  INFIX);
-               ("asr",  INFIX);
+               ("or", INFIX "or");
+               ("mod",  INFIX "mod");
+               ("land", INFIX "land");
+               ("lor",  INFIX "lor");
+               ("lxor", INFIX "lxor");
+               ("lsl",  INFIX "lsl");
+               ("lsr",  INFIX "lsr");
+               ("asr",  INFIX "asr");
 
                ("(", OPEN);
                (")", CLOSE);
                (";", SEMICOLON);
+               ("[", OPENBRACKET);
+               ("]", CLOSEBRACKET);
+               ("|", PIPE);
              ]
 }
 
@@ -57,7 +60,7 @@ let letter = ['a'-'z' 'A'-'Z']
 
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
-let sym = ['(' ')'] | (['+' '*' '/' '.' '=' '~' ';' '<' '>']+)
+let sym = ['(' ')'] | (['+' '*' '/' '.' '=' '~' ';' '<' '>' '[' ']']+)
 
 let hex = ['0'-'9' 'A'-'F' 'a'-'f']
 
@@ -92,6 +95,17 @@ rule token = parse
     {
       CHAR (String.get char_literal 1)
     }
+  | '"'(regular_char | escape_sequence)*'"' as string_literal
+    {
+      STRING (String.sub string_literal 1 (String.length string_literal - 2))
+    }
+  | sym as symbol
+    { try
+        let token = Hashtbl.find sym_table symbol in
+        token
+      with Not_found ->
+        token lexbuf
+    }
   | infix_symbol operator_char* as infix_op
     {
       INFIX infix_op
@@ -107,13 +121,6 @@ rule token = parse
         with Not_found ->
           ID word
       }
-  | sym as symbol
-    { try
-        let token = Hashtbl.find sym_table symbol in
-        token
-      with Not_found ->
-        token lexbuf
-    }
   | '{' [^ '\n']* '}'   { token lexbuf }    (* skip one-line comments *)
   | [' ' '\t' '\n'] { token lexbuf }    (* skip whitespace *)
   | _ as c                                  (* warn and skip unrecognized characters *)
