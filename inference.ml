@@ -87,10 +87,7 @@ let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * t
   | AVar (_, _) :: r | AConst _ :: r | ANil _ :: r -> collect r u
   | AFun (_, ae, _) :: r | ALet (_, ae, _) :: r -> collect (ae :: r) u
   | ALetIn (_, ae1, ae2, b) :: r ->
-      (* ▼ PROBLEMS ▼ *)
-      let a = type_of ae1 in
       collect (ae1 :: ae2 :: r) u
-      (* ▲ PROBLEMS ▲ *)
   | AApp (ae1, ae2, a) :: r ->
       let (f, b) = (type_of ae1, type_of ae2) in
       collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
