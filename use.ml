@@ -16,6 +16,8 @@ let test str =
   let lexbuf = Lexing.from_string (str ^ ";;..") in
   MP.input ML.token lexbuf ;;
 
+let testt str = List.hd (test str) 
+
 let tok = Lexing.from_string 
 
 let next = ML.token
