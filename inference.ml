@@ -1,49 +1,74 @@
-#mod_use "expr.ml" ;;
+(******************************************
+ * Type inference for simple lambda terms *
+ ******************************************)
+open Expr ;;
+open Unification ;;
 
-type varname = string
+type aexpr =
+  | AFun of varid * aexpr * typing
+  | AApp of aexpr * aexpr * typing
+  | AVar of varid * typing
+  | AConst of typing
 
-type typing =
-  | TVar of varname
-  | TArrow of typing * typing
+let code = ref 0
 
-type environment = (varname * typing) list
+let reset_type_vars() = code := 0
 
-(* If in b we have Var id, substitute a for Var id *)
-let rec sub (a : typing) (id : varname) (b : typing) : typing =
-  match b with
-  | TVar x -> if x = id then a else b
-  | TArrow (x, y) -> TArrow (sub a id x, sub a id y)
+let next_type_var() : typing =
+  incr code;
+  TVar (string_of_int !code)
 
-(* 
-  Apply our environment of appropriate subs
-  to a typing to get a new typing
-*)
-let apply_env (e : environment) (t : typing) : typing =
-  List.fold_right (fun (v, t) -> sub t v) e t
+let type_of (ae : aexpr) : typing =
+  match ae with
+    AVar (_, a) -> a
+  | AFun (_, _, a) -> a
+  | AApp (_, _, a) -> a
+  | AConst a -> a
+  
+(* annotate all subexpressions with types *)
+(* bv = stack of bound variables for which current expression is in scope *)
+(* fv = hashtable of known free variables *)
+let annotate (e : expr) : aexpr =
+  let (h : (varid, typing) Hashtbl.t) = Hashtbl.create 16 in
+  let rec annotate' (e : expr) (bv : (varid * typing) list) : aexpr =
+    match e with
+      Var x ->
+        (* bound variable? *)
+        (try let a = List.assoc x bv in AVar (x, a)
+        (* known free variable? *)
+        with Not_found -> try let a = Hashtbl.find h x in AVar (x, a)
+        (* unknown free variable *)
+        with Not_found -> let a = next_type_var() in Hashtbl.add h x a; AVar (x, a))
+    | Fun (x, e) ->
+        (* assign a new type to x *)
+        let a = next_type_var() in
+        let ae = annotate' e ((x, a) :: bv) in
+        AFun (x, ae, TArrow (a, type_of ae))
+    | App (e1, e2) ->
+        AApp (annotate' e1 bv, annotate' e2 bv, next_type_var())
+    | Int _ -> AConst (TVar "int")
+    | Float _ -> AConst (TVar "float")
+    | Bool _ -> AConst (TVar "bool")
+    | String _ -> AConst (TVar "string")
+    | Char _ -> AConst (TVar "char")
+    | Unit -> AConst (TVar "unit")
+  in annotate' e []
 
-(*
-  Identify the list of substitutions we need to make in order
-  to unify a pair of typing elements a and b
-*)
-let rec unify (a : typing) (b : typing) : environment =
-  match a, b with
-  | TVar x, TVar y -> if x = y then [] else [(x, b)]
-  | TArrow (w, x), TArrow (y, z) -> (unify w y) @ (unify x z)
-  | TVar x, ar | ar, TVar x -> [(x, ar)]
+(* collect constraints for unification *)
+let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * typing) list =
+  match aexprs with
+    [] -> u
+  | AVar (_, _) :: r -> collect r u
+  | AFun (_, ae, _) :: r -> collect (ae :: r) u
+  | AApp (ae1, ae2, a) :: r ->
+      let (f, b) = (type_of ae1, type_of ae2) in
+      collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
+  | AConst _ :: r -> collect r u
 
-let rec unify_list (l : (typing * typing) list) : environment =
-  match l with
-  | [] -> []
-  | (a, b)::t -> (unify a b)::(unify_list t)
-
-(* 
-  I think the idea here is now we have
-  parts of expr hash to unique characters
-  and hash these unique characters to
-  their appropriate data types or
-  "unassigned", and then perform a unification
-  and go back on the hash table to get the
-  appropriate types.
-
-  2 hash tables
-*)
+(* collect the constraints and perform unification *)
+let infer (e : expr) : typing =
+  reset_type_vars();
+  let ae = annotate e in
+  let cl = collect [ae] [] in
+  let s = Unification.unify_list cl in
+  Unification.apply_env s (type_of ae)
