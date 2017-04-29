@@ -3,7 +3,7 @@ type varid = string
 
 type typing =
   | TVar of varid
-  | TSpec of string * typing
+  | TStruct of string * typing
   | TArrow of typing * typing
 
 type environment = (varid * typing) list
@@ -13,7 +13,7 @@ let rec sub (a : typing) (id : varid) (b : typing) : typing =
   match b with
   | TVar x -> if x = id then a else b
   | TArrow (x, y) -> TArrow (sub a id x, sub a id y)
-  | TSpec (t, x) -> TSpec (t, sub a id x)
+  | TStruct (t, x) -> TStruct (t, sub a id x)
 
 (* 
   Apply our environment of appropriate subs
@@ -31,7 +31,7 @@ let rec unify (a : typing) (b : typing) : environment =
   | TVar x, TVar y -> if x = y then [] else [(x, b)]
   | TArrow (w, x), TArrow (y, z) -> (unify w y) @ (unify x z)
   | TVar x, ar | ar, TVar x -> [(x, ar)]
-  | TSpec (_, x), ar | ar, TSpec (_, x) -> unify x ar
+  | TStruct (_, x), ar | ar, TStruct (_, x) -> unify x ar
 
 let rec unify_list (l : (typing * typing) list) : environment =
   match l with

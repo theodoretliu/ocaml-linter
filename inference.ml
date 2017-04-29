@@ -73,9 +73,9 @@ let annotate (e : expr) : aexpr =
     | Cons (h, t) ->
         let ah = annotate' h bv in
         let at = annotate' t bv in
-        ACons (ah, at, TSpec ("list", type_of ah))
+        ACons (ah, at, TStruct ("list", type_of ah))
     | Nil ->
-        ANil (TSpec ("list", next_type_var ()))
+        ANil (TStruct ("list", next_type_var ()))
 
 
   in annotate' e []
