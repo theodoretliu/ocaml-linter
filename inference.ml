@@ -83,16 +83,16 @@ let annotate (e : expr) : aexpr =
 (* collect constraints for unification *)
 let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * typing) list =
   match aexprs with
-    [] -> u
-  | AVar (_, _) :: r | AConst _ :: r | ANil _ :: r -> collect r u
-  | AFun (_, ae, _) :: r | ALet (_, ae, _) :: r -> collect (ae :: r) u
+  | [] -> u
+  | AVar (_, _) :: r | AConst _ :: r | ANil _ :: r ->
+      collect r u
+  | AFun (_, ae, _) :: r | ACons (_, ae, _) :: r  | ALet (_, ae, _) :: r ->
+      collect (ae :: r) u
   | ALetIn (_, ae1, ae2, b) :: r ->
       collect (ae1 :: ae2 :: r) u
   | AApp (ae1, ae2, a) :: r ->
       let (f, b) = (type_of ae1, type_of ae2) in
       collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
-  | ACons (_, t, a) :: r ->
-      collect (t :: r) ((type_of t, a) :: u)
 
  
 (* collect the constraints and perform unification *)
