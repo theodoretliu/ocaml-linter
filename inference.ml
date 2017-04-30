@@ -4,6 +4,21 @@
 open Expr ;;
 open Unification ;;
 
+let int_binop = TArrow (TVar "int", TArrow (TVar "int", TVar "int"))
+let float_binop = TArrow (TVar "float", TArrow (TVar "float", TVar "float"))
+
+let built_ins =
+  Lexer.create_hashtable 16 [
+                    ("+", int_binop);
+                    ("-", int_binop);
+                    ("*", int_binop);
+                    ("/", int_binop);
+                    ("+.", float_binop);
+                    ("-.", float_binop);
+                    ("*.", float_binop);
+                    ("/.", float_binop);
+                  ]
+
 type aexpr =
   | AFun of varid * aexpr * typing
   | ALet of varid * aexpr * typing
@@ -76,6 +91,17 @@ let annotate (e : expr) : aexpr =
         ACons (ah, at, TStruct ("list", type_of ah))
     | Nil ->
         ANil (TStruct ("list", next_type_var ()))
+    | Infix (x, e1, e2) ->
+        try
+          let t = Hashtbl.find built_ins x in
+          let a = next_type_var () in
+          let b = next_type_var () in
+          AApp (AApp (AVar (x, t), annotate' e1 bv, a), annotate' e2 bv, b)
+        with Not_found ->
+          let a = next_type_var () in
+          let b = next_type_var () in
+          let c = next_type_var () in
+          AApp (AApp (AVar (x, a), annotate' e1 bv, b), annotate' e2 bv, c)
 
 
   in annotate' e []

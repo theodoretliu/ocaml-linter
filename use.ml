@@ -24,3 +24,8 @@ let next = ML.token
 
 (* ocamlyacc parser.mly *)
 (* ocamllex lexer.mli *)
+
+let ae e = reset_type_vars (); annotate e
+let cl e = reset_type_vars (); collect [ae e] []
+let ul e = reset_type_vars (); Unification.unify_list (cl e)
+let ap e = reset_type_vars (); apply_env (ul e) (type_of (ae e))
