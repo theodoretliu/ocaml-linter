@@ -3,21 +3,9 @@
  ******************************************)
 open Expr ;;
 open Unification ;;
+open Builtins ;;
 
-let int_binop = TArrow (TVar "int", TArrow (TVar "int", TVar "int"))
-let float_binop = TArrow (TVar "float", TArrow (TVar "float", TVar "float"))
-
-let built_ins =
-  Lexer.create_hashtable 16 [
-                    ("+", int_binop);
-                    ("-", int_binop);
-                    ("*", int_binop);
-                    ("/", int_binop);
-                    ("+.", float_binop);
-                    ("-.", float_binop);
-                    ("*.", float_binop);
-                    ("/.", float_binop);
-                  ]
+exception Unbound_value of string 
 
 type aexpr =
   | AFun of varid * aexpr * typing
@@ -28,6 +16,7 @@ type aexpr =
   | AConst of typing
   | ANil of typing
   | ACons of aexpr * aexpr * typing
+  | AInfix of varid * aexpr * aexpr * typing
 
 let code = ref 0
 
@@ -39,7 +28,7 @@ let next_type_var () : typing =
 
 let type_of (ae : aexpr) : typing =
   match ae with
-    AVar (_, a) -> a
+  | AVar (_, a) -> a
   | AFun (_, _, a) -> a
   | ALet (_, _, a) -> a
   | ALetIn (_, _, _, a) -> a
@@ -47,7 +36,12 @@ let type_of (ae : aexpr) : typing =
   | AConst a -> a
   | ACons (_ ,_, a) -> a
   | ANil a -> a
-  
+  | AInfix (_, _, _, a) -> a
+
+let last_el (lst : 'a list) : 'a =
+  if lst = [] then raise (Invalid_argument "last_el: empty list")
+  else List.fold_left (fun _ x -> x) (List.hd lst) lst
+
 (* annotate all subexpressions with types *)
 (* bv = stack of bound variables for which current expression is in scope *)
 (* fv = hashtable of known free variables *)
@@ -55,7 +49,7 @@ let annotate (e : expr) : aexpr =
   let (h : (varid, typing) Hashtbl.t) = Hashtbl.create 16 in
   let rec annotate' (e : expr) (bv : (varid * typing) list) : aexpr =
     match e with
-      Var x ->
+    | Var x ->
         (* bound variable? *)
         (try let a = List.assoc x bv in AVar (x, a)
         (* known free variable? *)
@@ -92,17 +86,12 @@ let annotate (e : expr) : aexpr =
     | Nil ->
         ANil (TStruct ("list", next_type_var ()))
     | Infix (x, e1, e2) ->
-        try
-          let t = Hashtbl.find built_ins x in
+(*         try
+          let typ = Hashtbl.find built_ins x in
+          AInfix (x, annotate' e1 bv, annotate' e2 bv, last_el typ)
+        with Not_found -> *)
           let a = next_type_var () in
-          let b = next_type_var () in
-          AApp (AApp (AVar (x, t), annotate' e1 bv, a), annotate' e2 bv, b)
-        with Not_found ->
-          let a = next_type_var () in
-          let b = next_type_var () in
-          let c = next_type_var () in
-          AApp (AApp (AVar (x, a), annotate' e1 bv, b), annotate' e2 bv, c)
-
+          AInfix (x, annotate' e1 bv, annotate' e2 bv, a)
 
   in annotate' e []
 
@@ -119,6 +108,14 @@ let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * t
   | AApp (ae1, ae2, a) :: r ->
       let (f, b) = (type_of ae1, type_of ae2) in
       collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
+  | AInfix (s, ae1, ae2, a) :: r ->
+      try
+        let unknowns = [type_of ae1; type_of ae2; a] in
+        let knowns = Hashtbl.find built_ins s in
+        let additions = List.map2 (fun x y -> (x, y)) unknowns knowns in
+        collect (ae1 :: ae2 :: r) (additions @ u)
+      with Not_found ->
+        raise (Unbound_value s)
 
  
 (* collect the constraints and perform unification *)
