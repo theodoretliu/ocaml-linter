@@ -30,6 +30,9 @@ let line_length_check (str : string) : unit =
   in List.iteri is_overlength lines
 ;;
 
+let crawl_ast (e : Expr.expr) : unit =
+  
+
 let whitespace_check (str : string) : unit =
   let operator_char = Str.regexp "[! $ % & * + \\- . / : < = > ? @ ^ | ~]"
   let infix_symbol = Str.regexp "[= < > @ ^ | & + \\- * / $ %]"

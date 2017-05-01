@@ -44,5 +44,6 @@ type expr =
   | Match of expr * expr
   | MNil
   | MCons of expr * expr * expr
+  | Const of varid
   | Unassigned                                  (* (temporarily) unassigned *)
  and varid = string ;;

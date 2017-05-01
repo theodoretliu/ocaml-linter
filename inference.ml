@@ -65,12 +65,7 @@ let annotate (e : expr) : aexpr =
     | App (e1, e2) ->
         let a = next_type_var () in 
         AApp (annotate' e1 bv, annotate' e2 bv, a)
-    | Int _ -> AConst (TVar "int")
-    | Float _ -> AConst (TVar "float")
-    | Bool _ -> AConst (TVar "bool")
-    | String _ -> AConst (TVar "string")
-    | Char _ -> AConst (TVar "char")
-    | Unit -> AConst (TVar "unit")
+    | Const s -> AConst (TVar s)
     | Let (x, e) ->
         let a = next_type_var () in
         let ae = annotate' e ((x, a) :: bv) in

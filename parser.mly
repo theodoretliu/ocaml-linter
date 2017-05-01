@@ -67,13 +67,13 @@ matchexp:
 
 expnoapp:
   | ID                                { Var $1 }
-  | INT                               { Int $1 }
-  | TRUE                              { Bool true }
-  | FALSE                             { Bool false }
-  | FLOAT                             { Float $1 }
-  | STRING                            { String $1 }
-  | CHAR                              { Char $1 }
-  | OPEN CLOSE                        { Unit }
+  | INT                               { Const "int" }
+  | TRUE                              { Const "bool" }
+  | FALSE                             { Const "bool" }
+  | FLOAT                             { Const "float" }
+  | STRING                            { Const "string" }
+  | CHAR                              { Const "char" }
+  | UNIT                              { Const "unit" }
   | OPEN exp CLOSE                    { $2 }
   | OPENBRACKET listexp CLOSEBRACKET  { List.fold_right 
                                           (fun x y -> Cons (x, y)) $2 Nil }
