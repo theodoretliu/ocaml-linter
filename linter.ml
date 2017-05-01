@@ -33,6 +33,41 @@ let find_overlength_lines (str : string) : line list =
 ;;
 
 (*
+  INPUT: a string `c` to match on, a string `str` to search through
+  OUTPUT: the number of occurrences of `c` in `str`
+*)
+let count_substring (c : string) (str : string) : int =
+  (List.length (Str.split_delim (Str.regexp c) str)) - 1
+;;
+
+(*
+  INPUT: a pair of open and close characters such as (, ), and a str to search
+  OUTPUT: line numbers where a mismatch may occur
+*)
+let find_mismatched_chars (op : string)
+                          (cl : string)
+                          (str : string) : unit =
+  let lines = Str.split (Str.regexp "\n") str in
+  let num_chars_open = List.map (count_substring op) lines in
+  let num_chars_close = List.map (count_substring cl) lines in
+  let rec find_mismatched_chars' opa cla ind last_ind count =
+    match opa, cla with
+    | oph::opt, clh::clt ->
+      let overflow = oph - clh + count in
+      if overflow > 0 then find_mismatched_chars' opt clt (ind + 1) ind overflow
+      else
+        if overflow < 0 then
+          (Printf.printf "Warning: missing opening %s on line %d\n" op ind;
+          find_mismatched_chars' opt clt (ind + 1) last_ind 0)
+        else find_mismatched_chars' opt clt (ind + 1) last_ind 0
+    | [], [] ->
+      if count > 0 then
+        (Printf.printf "Warning: missing closing %s on line %d\n" cl last_ind;
+         ())
+    | [], _ | _, [] -> failwith "Fatal error."
+  in find_mismatched_chars' num_chars_open num_chars_close 0 0 0
+
+(*
   INPUT: a line
   OUTPUT: unit. prints the line warning
 *)
