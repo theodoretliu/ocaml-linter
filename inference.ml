@@ -11,7 +11,7 @@ type aexpr =
   | AFun of varid * aexpr * typing
   | ALet of varid * aexpr * typing
   | ALetIn of varid * aexpr * aexpr * typing
-  | AApp of varid * aexpr * aexpr * typing
+  | AApp of aexpr * aexpr * typing
   | AVar of varid * typing
   | AConst of typing
   | ANil of typing
@@ -32,7 +32,7 @@ let type_of (ae : aexpr) : typing =
   | AFun (_, _, a) -> a
   | ALet (_, _, a) -> a
   | ALetIn (_, _, _, a) -> a
-  | AApp (_, _, _, a) -> a
+  | AApp (_, _, a) -> a
   | AConst a -> a
   | ACons (_ ,_, a) -> a
   | ANil a -> a
@@ -64,9 +64,7 @@ let annotate (e : expr) : aexpr =
         AFun (x, ae, TArrow (a, type_of ae))
     | App (e1, e2) ->
         let a = next_type_var () in 
-        (match e1 with
-        | Var s -> AApp (s, annotate' e1 bv, annotate' e2 bv, a)
-        | _ -> AApp ("", annotate' e1 bv, annotate' e2 bv, a))
+        AApp (annotate' e1 bv, annotate' e2 bv, a)
     | Int _ -> AConst (TVar "int")
     | Float _ -> AConst (TVar "float")
     | Bool _ -> AConst (TVar "bool")
@@ -105,7 +103,7 @@ let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * t
       collect (ae :: r) u
   | ALetIn (_, ae1, ae2, b) :: r ->
       collect (ae1 :: ae2 :: r) u
-  | AApp (s, ae1, ae2, a) :: r ->
+  | AApp (ae1, ae2, a) :: r ->
         let (f, b) = (type_of ae1, type_of ae2) in
         collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
   | AInfix (s, ae1, ae2, a) :: r ->
