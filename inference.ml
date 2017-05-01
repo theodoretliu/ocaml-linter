@@ -11,7 +11,7 @@ type aexpr =
   | AFun of varid * aexpr * typing
   | ALet of varid * aexpr * typing
   | ALetIn of varid * aexpr * aexpr * typing
-  | AApp of aexpr * aexpr * typing
+  | AApp of varid * aexpr * aexpr * typing
   | AVar of varid * typing
   | AConst of typing
   | ANil of typing
@@ -32,15 +32,16 @@ let type_of (ae : aexpr) : typing =
   | AFun (_, _, a) -> a
   | ALet (_, _, a) -> a
   | ALetIn (_, _, _, a) -> a
-  | AApp (_, _, a) -> a
+  | AApp (_, _, _, a) -> a
   | AConst a -> a
   | ACons (_ ,_, a) -> a
   | ANil a -> a
   | AInfix (_, _, _, a) -> a
 
 let last_el (lst : 'a list) : 'a =
-  if lst = [] then raise (Invalid_argument "last_el: empty list")
-  else List.fold_left (fun _ x -> x) (List.hd lst) lst
+  match lst with
+  | [] -> raise (Invalid_argument "last_el: empty list")
+  | h :: t -> List.fold_left (fun _ x -> x) h t
 
 (* annotate all subexpressions with types *)
 (* bv = stack of bound variables for which current expression is in scope *)
@@ -62,7 +63,10 @@ let annotate (e : expr) : aexpr =
         let ae = annotate' e ((x, a) :: bv) in
         AFun (x, ae, TArrow (a, type_of ae))
     | App (e1, e2) ->
-        AApp (annotate' e1 bv, annotate' e2 bv, next_type_var ())
+        let a = next_type_var () in 
+        (match e1 with
+        | Var s -> AApp (s, annotate' e1 bv, annotate' e2 bv, a)
+        | _ -> AApp ("", annotate' e1 bv, annotate' e2 bv, a))
     | Int _ -> AConst (TVar "int")
     | Float _ -> AConst (TVar "float")
     | Bool _ -> AConst (TVar "bool")
@@ -86,10 +90,6 @@ let annotate (e : expr) : aexpr =
     | Nil ->
         ANil (TStruct ("list", next_type_var ()))
     | Infix (x, e1, e2) ->
-(*         try
-          let typ = Hashtbl.find built_ins x in
-          AInfix (x, annotate' e1 bv, annotate' e2 bv, last_el typ)
-        with Not_found -> *)
           let a = next_type_var () in
           AInfix (x, annotate' e1 bv, annotate' e2 bv, a)
 
@@ -105,9 +105,9 @@ let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * t
       collect (ae :: r) u
   | ALetIn (_, ae1, ae2, b) :: r ->
       collect (ae1 :: ae2 :: r) u
-  | AApp (ae1, ae2, a) :: r ->
-      let (f, b) = (type_of ae1, type_of ae2) in
-      collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
+  | AApp (s, ae1, ae2, a) :: r ->
+        let (f, b) = (type_of ae1, type_of ae2) in
+        collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
   | AInfix (s, ae1, ae2, a) :: r ->
       try
         let unknowns = [type_of ae1; type_of ae2; a] in
@@ -115,7 +115,8 @@ let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * t
         let additions = List.map2 (fun x y -> (x, y)) unknowns knowns in
         collect (ae1 :: ae2 :: r) (additions @ u)
       with Not_found ->
-        raise (Unbound_value s)
+        let (f, b) = (type_of ae1, type_of ae2) in
+        collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
 
  
 (* collect the constraints and perform unification *)

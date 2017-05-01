@@ -13,7 +13,7 @@ let compare_binop = [TVar "'a"; TVar "'a"; TVar "bool"]
 let alpha_binop = [TVar "'a"; TVar "'a"; TVar "'a"]
 
 let built_ins =
-  Lexer.create_hashtable 50 [
+  Lexer.create_hashtable 64 [
                     ("raise", [TVar "exn"; TVar "'a"]);
                     ("raise_notrace", [TVar "exn"; TVar "'a"]);
                     ("invalid_arg", [TVar "string"; TVar "'a"]);

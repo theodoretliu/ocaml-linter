@@ -110,6 +110,14 @@ rule token = parse
     {
       STRING (String.sub string_literal 1 (String.length string_literal - 2))
     }
+  | '(' ' '+ '*' infix_symbol* operator_char* ' '* ')'
+  | '(' ' '*  ['=' '<' '>' '@' '^' '|' '&' '+' '-' '/' '$' '%'] operator_char* ' '* ')'
+  | '(' ' '* (('!' operator_char*) | (['?' '~'] operator_char+)) ' '* ')' as xfix_func
+      {
+        let re = Str.regexp "[\\( \\)]" in
+        let s = Str.global_replace re "" xfix_func in 
+        ID s
+      } 
   | two_sym as symbol
     { try
         let token = Hashtbl.find sym_table symbol in
