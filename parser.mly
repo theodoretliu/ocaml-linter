@@ -81,7 +81,8 @@ expnoapp:
   | exp CONS exp                      { Cons ($1, $3) }
   | PREFIX exp                        { Prefix ($1, $2) }
   | exp INFIX exp                     { Infix ($2, $1, $3) }
-  | FUNCTION ID DOT exp               { Fun ($2, $4) }
+  | FUNCTION x=ID+ DOT exp              
+      { List.fold_right (fun x y -> Fun (x, y)) x $4 }
   | x=INFIX exp                       { let y = 
                                           match x with
                                           | "+" | "+." | "-" | "-." as x -> x
