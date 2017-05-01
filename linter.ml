@@ -81,7 +81,7 @@ if Array.length Sys.argv = 2 then
     let s = read_file Sys.argv.(1) in
     let lines = find_overlength_lines s in
     List.iter report lines;
-
+    Parens.find_mismatch s 1 1 [] problem_free ;
     if !problem_free then
       print_endline "No problems detected!"
     else ()
