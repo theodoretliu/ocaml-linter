@@ -52,4 +52,4 @@ if Array.length Sys.argv = 2 then
     else ()
   end
 else
-  print_endline "Usage: tokenizer.byte filename"
+  print_endline "Usage: linter.byte filename"

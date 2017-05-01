@@ -64,7 +64,7 @@ let letter = ['a'-'z' 'A'-'Z']
 
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
-let sym = ['(' ')' '+' '*' '/' '.' '=' '~' ';' '<' '>' '[' ']']
+let sym = ['(' ')' '+' '*' '/' '.' '=' '~' ';' '<' '>' '[' ']' '|']
 
 let two_sym = "->" | ";;.." | ";;" | "::"
 
@@ -140,12 +140,15 @@ rule token = parse
     {
       PREFIX prefix_op
     }
-  | id as word
-    { try
-          let token = Hashtbl.find keyword_table word in
+  | id | '(' ' '* id ' '* ')' as word
+    { 
+      let re = Str.regexp "[\\( \\)]" in
+      let s = Str.global_replace re "" word in 
+      try
+          let token = Hashtbl.find keyword_table s in
           token 
-        with Not_found ->
-          ID word
+      with Not_found ->
+          ID s
       }
   | '{' [^ '\n']* '}'   { token lexbuf }    (* skip one-line comments *)
   | [' ' '\t' '\n'] { token lexbuf }    (* skip whitespace *)

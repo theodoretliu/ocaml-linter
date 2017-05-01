@@ -18,7 +18,7 @@ type binop =
   | CompareBinop
   | BoolBinop
 ;;
-      
+
 type expr =
   | Var of varid                                (* variables *)
   | Int of int                                  (* integers *)
@@ -41,5 +41,8 @@ type expr =
   | Nil                                         (* list Nil *)
   | Prefix of string * expr                     (* prefixed operators *)
   | Infix of string * expr * expr               (* infixed operators *)
+  | Match of expr * expr
+  | MNil
+  | MCons of expr * expr * expr
   | Unassigned                                  (* (temporarily) unassigned *)
  and varid = string ;;

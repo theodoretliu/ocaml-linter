@@ -59,9 +59,11 @@ listexp:
   | exp                   { [$1] }
   |                       { [] }
 
-idexp:
-  | ID                    { $1 }
-  | OPEN ID CLOSE         { $2 }
+matchexp:
+  | PIPE exp DOT exp PIPE matchexp    { ($2, $4) :: $6 }
+  | exp DOT exp PIPE matchexp         { ($1, $3) :: $5 }
+  | PIPE exp DOT exp                  { [($2, $4)] }
+  | exp DOT exp                       { [($1, $3)] }
 
 expnoapp:
   | ID                                { Var $1 }
@@ -79,20 +81,28 @@ expnoapp:
   | exp CONS exp                      { Cons ($1, $3) }
   | PREFIX exp                        { Prefix ($1, $2) }
   | exp INFIX exp                     { Infix ($2, $1, $3) }
-  | FUNCTION idexp DOT exp            { Fun ($2, $4) }
-  | LET idexp EQUALS exp              { Let ($2, $4) }
-  | LET idexp EQUALS exp IN exp       { LetIn ($2, $4, $6) }
-  | LET REC idexp EQUALS exp          { LetRec ($3, $5) }
-  | LET REC idexp EQUALS exp IN exp   { LetRecIn ($3, $5, $7) }
+  | FUNCTION ID DOT exp               { Fun ($2, $4) }
+  | LET ID EQUALS exp                 { Let ($2, $4) }
+  | LET ID EQUALS exp IN exp          { LetIn ($2, $4, $6) }
+  | LET REC ID EQUALS exp             { LetRec ($3, $5) }
+  | LET REC ID EQUALS exp IN exp      { LetRecIn ($3, $5, $7) }
   | x=INFIX exp                       { let y = 
                                           match x with
-                                          | "+" | "+-" | "-" | "-." as x -> "~" ^ x
+                                          | "+" | "+." | "-" | "-." as x -> x
                                           | _ as x -> failwith "Invalid prefix"
-                                        in Prefix (y, $2) }
-  | IF exp THEN exp x=option(pair(ELSE, exp)) { let el = 
-                                                  match x with
-                                                  | None -> None
-                                                  | Some (_, b) -> Some b in
-                                                Conditional ($2, $4, el) }
+                                        in Prefix ("~" ^ y, $2) }
+  | IF exp THEN exp 
+      x=option(pair(ELSE, exp))       { let el = 
+                                          match x with
+                                          | None -> None
+                                          | Some (_, b) -> Some b in
+                                        Conditional ($2, $4, el) }
+  | LET x=ID y=nonempty_list(ID)
+      EQUALS z=exp                    { let l = List.fold_right 
+                                          (fun x y -> Fun (x, y)) y z in
+                                        Let (x, l) }
+  | MATCH exp WITH matchexp           
+      { let l = List.fold_right (fun (x1, x2) y -> MCons (x1, x2, y)) $4 MNil in 
+        Match ($2, l) }
 
 %%
