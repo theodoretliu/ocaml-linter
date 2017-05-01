@@ -8,17 +8,20 @@ let read_file (file_name : string) : string =
   let str = Bytes.create len in
   really_input in_channel str 0 len;
   close_in in_channel;
-  str
+  str ;;
 
-if Array.length Sys.argv = 2 then
-  begin
-    let s = read_file Sys.argv.(1) in
-    let lines = find_overlength_lines s in
-    List.iter report lines;
-    Parens.find_mismatch s 1 1 [] problem_free ;
-    if !problem_free then
-      print_endline "No problems detected!"
-    else ()
-  end
-else
-  print_endline "Usage: linter.byte filename"
+let main () = 
+  if Array.length Sys.argv = 2 then
+    begin
+      let s = read_file Sys.argv.(1) in
+      let str = Style.contains_tabs_check s in
+      Style.line_length_check str ;
+      Style.find_mismatch str ;
+      if !Style.problem_free then
+        print_endline "No problems detected!"
+      else ()
+    end
+  else
+    print_endline "Usage: linter.byte filename" ;;
+
+main () ;;

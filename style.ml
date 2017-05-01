@@ -2,18 +2,23 @@ open Printf ;;
 let problem_free = ref true ;;
 
 (* 
-  INPUT: a string
-  OUTPUT: a list of 'line's
-  note: assuming that tabs = 2 spaces for the purpose of counting line lengths
+  Determines if a string contains tabs as opposed to spaces,
+  converts tabs into two spaces, and returns the modified string
 *)
-let line_length_check (str : string) : unit =
+let contains_tabs_check (str : string) : string = 
   if String.contains str '\t' then
     begin
-      print_endline "Warning: You're using tabs. Spaces are preferred.";
+      print_endline "Warning: Youre using tabs. Spaces are preferred.";
       problem_free := false;
     end
   else ();
-  let str = Str.global_replace (Str.regexp "\t") "  " str in
+  Str.global_replace (Str.regexp "\t") "  " str
+;;
+
+(* 
+  Finds lines that have length > 80 and reports them
+*)
+let line_length_check (str : string) : unit =
   let lines = Str.split (Str.regexp "\n") str in
   let is_overlength index s =
     let len = String.length s in 
@@ -25,6 +30,8 @@ let line_length_check (str : string) : unit =
   in List.iteri is_overlength lines
 ;;
 
-let operator_char = ['!' '$' '%' '&' '*' '+' '-' '.' '/' ':' '<' '=' '>' '?' '@' '^' '|' '~']
+(* let whitespace_check (str : string) : unit =
+  let operator_char = Str.regexp "[! $ % & * + \\- . / : < = > ? @ ^ | ~]"
+  let infix_symbol = Str.regexp "[= < > @ ^ | & + \\- * / $ %]" *)
 
-let infix_symbol = ['=' '<' '>' '@' '^' '|' '&' '+' '-' '*' '/' '$' '%']
+let find_mismatch (s : string) = Parens.find_mismatch s 1 1 [] problem_free
