@@ -82,10 +82,6 @@ expnoapp:
   | PREFIX exp                        { Prefix ($1, $2) }
   | exp INFIX exp                     { Infix ($2, $1, $3) }
   | FUNCTION ID DOT exp               { Fun ($2, $4) }
-  | LET ID EQUALS exp                 { Let ($2, $4) }
-  | LET ID EQUALS exp IN exp          { LetIn ($2, $4, $6) }
-  | LET REC ID EQUALS exp             { LetRec ($3, $5) }
-  | LET REC ID EQUALS exp IN exp      { LetRecIn ($3, $5, $7) }
   | x=INFIX exp                       { let y = 
                                           match x with
                                           | "+" | "+." | "-" | "-." as x -> x
@@ -97,10 +93,14 @@ expnoapp:
                                           | None -> None
                                           | Some (_, b) -> Some b in
                                         Conditional ($2, $4, el) }
-  | LET x=ID y=nonempty_list(ID)
-      EQUALS z=exp                    { let l = List.fold_right 
-                                          (fun x y -> Fun (x, y)) y z in
-                                        Let (x, l) }
+  | LET x=boption(REC) y=nonempty_list(ID) EQUALS z=exp a=option(preceded(IN, exp)) 
+      { let h :: t = y in
+        let l = List.fold_right (fun x y -> Fun (x, y)) t z in
+        match x, a with
+        | false, None -> Let (h, l)
+        | false, Some b -> LetIn (h, l, b)
+        | true, None -> LetRec (h, l) 
+        | true, Some b -> LetRecIn (h, l, b) }
   | MATCH exp WITH matchexp           
       { let l = List.fold_right (fun (x1, x2) y -> MCons (x1, x2, y)) $4 MNil in 
         Match ($2, l) }
