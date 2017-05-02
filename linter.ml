@@ -27,6 +27,8 @@ let main () =
       let lexbuf = Lexing.from_string parse_ready in
       let tree = Parser.input Lexer.token lexbuf in
       List.iter Ast.find_singular_match tree ;
+      Style.trailing_whitespace_check str ;
+      Style.delimiter_mismatch_check str ;
       if !Style.problem_free then
         print_endline "No problems detected!"
       else ()
