@@ -1,4 +1,4 @@
-(* 
+(*
   INPUT: file_name, a string that is the path to the file
   OUTPUT: str, a string that contains the contents of the file at file_name
  *)
@@ -10,13 +10,23 @@ let read_file (file_name : string) : string =
   close_in in_channel;
   str ;;
 
-let main () = 
+let last (n : int) (s : string) : string =
+  let s = String.trim s in
+  String.sub s (String.length s - n) n
+
+let main () =
   if Array.length Sys.argv = 2 then
     begin
       let s = read_file Sys.argv.(1) in
       let str = Style.contains_tabs_check s in
       Style.line_length_check str;
-
+      let parse_ready =
+        if last 2 s = ";;" then
+          s ^ ".."
+        else s ^ ";;.." in
+      let lexbuf = Lexing.from_string parse_ready in
+      let tree = Parser.input Lexer.token lexbuf in
+      List.iter Ast.find_singular_match tree ;
       if !Style.problem_free then
         print_endline "No problems detected!"
       else ()
