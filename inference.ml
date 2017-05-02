@@ -104,8 +104,8 @@ let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * t
   | ALetIn (_, ae1, ae2, b) :: r ->
       collect (ae1 :: ae2 :: r) u
   | AApp (ae1, ae2, a) :: r ->
-        let (f, b) = (type_of ae1, type_of ae2) in
-        collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
+      let (f, b) = (type_of ae1, type_of ae2) in
+      collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
   | AInfix (s, ae1, ae2, a) :: r ->
       try
         let unknowns = [type_of ae1; type_of ae2; a] in
