@@ -35,3 +35,5 @@ let line_length_check (str : string) : unit =
   let infix_symbol = Str.regexp "[= < > @ ^ | & + \\- * / $ %]" *)
 
 let find_mismatch (s : string) = Parens.find_mismatch s 1 1 [] problem_free
+
+(* let find_indent_errors = Indent.find_indent_errors *)
