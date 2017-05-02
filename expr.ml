@@ -1,4 +1,4 @@
-(* 
+(*
        CS 51 Final Project
       MiniML -- Expressions
            Spring 2017
@@ -11,7 +11,7 @@ type unop =
   | FloatUnop
   | BoolUnop
 ;;
-    
+
 type binop =
   | IntBinop
   | FloatBinop
@@ -44,5 +44,7 @@ type expr =
   | Match of expr * expr
   | MNil
   | MCons of expr * expr * expr
+  | TNil
+  | TCons of expr * expr
   | Unassigned                                  (* (temporarily) unassigned *)
  and varid = string ;;

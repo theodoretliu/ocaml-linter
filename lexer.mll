@@ -12,7 +12,7 @@
     let alst = split (regexp ("[' ']*" ^ chr ^ "[' ']*")) lst in
     List.map Lexing.from_string alst
 
-  let keyword_table = 
+  let keyword_table =
     create_hashtable 8 [
                ("if", IF);
                ("in", IN);
@@ -40,17 +40,18 @@
                ("lsr",  INFIX "lsr");
                ("asr",  INFIX "asr");
              ]
-             
-  let sym_table = 
+
+  let sym_table =
     create_hashtable 8 [
                (".",  DOT);
+               (",", COMMA);
                ("->", DOT);
                (";;", EOF);
                ("=", EQUALS);
                ("::", CONS);
                (";;..", END);
 
-               
+
                ("(", OPEN);
                (")", CLOSE);
                (";", SEMICOLON);
@@ -64,13 +65,13 @@ let letter = ['a'-'z' 'A'-'Z']
 
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
-let sym = ['(' ')' '+' '*' '/' '.' '=' '~' ';' '<' '>' '[' ']' '|']
+let sym = ['(' ')' '+' '*' '/' '.' '=' '~' ';' '<' '>' '[' ']' '|' ',']
 
 let two_sym = "->" | ";;.." | ";;" | "::"
 
 let hex = ['0'-'9' 'A'-'F' 'a'-'f']
 
-let escape_sequence = '\\'['\\' '"' '\'' 'n' 't' 'b' 'r' ' '] 
+let escape_sequence = '\\'['\\' '"' '\'' 'n' 't' 'b' 'r' ' ']
                       | '\\'['0'-'9']['0'-'9']['0'-'9']
                       | '\\' 'x' hex hex hex
 
@@ -83,7 +84,7 @@ let infix_symbol = ['=' '<' '>' '@' '^' '|' '&' '+' '-' '*' '/' '$' '%']
 rule token = parse
   | (letter | '_') (letter | ['0'-'9'] | '_' | '\'')* as ident
     {
-      try 
+      try
         let token = Hashtbl.find keyword_table ident in
         token
       with Not_found ->
@@ -91,7 +92,7 @@ rule token = parse
     }
 
   (* capitalized ident *)
-  
+
   | '\''(regular_char | escape_sequence)'\'' as char_literal
     {
       CHAR (String.get char_literal 1)
@@ -136,7 +137,7 @@ rule token = parse
   | id as word
     { try
           let token = Hashtbl.find keyword_table word in
-          token 
+          token
         with Not_found ->
           ID word
       }
