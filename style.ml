@@ -1,4 +1,5 @@
 open Printf ;;
+open Expr ;;
 let problem_free = ref true ;;
 
 (* 
@@ -6,9 +7,9 @@ let problem_free = ref true ;;
   converts tabs into two spaces, and returns the modified string
 *)
 let contains_tabs_check (str : string) : string = 
-  if String.contains str \t then
+  if String.contains str '\t' then
     begin
-      print_endline "Warning: Youre using tabs. Spaces are preferred.";
+      print_endline "Warning: You're using tabs. Spaces are preferred.";
       problem_free := false;
     end
   else ();
@@ -30,9 +31,33 @@ let line_length_check (str : string) : unit =
   in List.iteri is_overlength lines
 ;;
 
-let crawl_ast (e : Expr.expr) : unit =
-  
+let rec crawl_ast (e : expr) : unit =
+  match e with
+  | Var v -> ()
+  | Conditional (e1, e2, eo) -> ()
+  | Fun (v, e) -> ()
+  | Let (v, e) -> ()
+  | LetIn (v, e1, e2) -> ()
+  | LetRec (v, e) -> ()
+  | LetRecIn (v, e1, e2) -> ()
+  | Raise -> ()
+  | App (e1, e2) -> ()
+  | Cons (e1, e2) -> ()
+  | Nil -> ()
+  | Prefix (s, e) -> ()
+  | Infix (s, e1, e2) -> ()
+  | Match (e1, e2) -> crawl_ast e1; crawl_ast e2
+  | MNil -> ()
+  | MCons (e1, e2, e3) ->
+    match e3 with
+    | MNil -> printf "Warning: single match statement"
+    | MCons (_, _, _) -> ()
+    | _ -> failwith "Impossible: not MCons in MCons"
+  | Const v -> ()
+  | Unassigned -> ()
+;;
 
 let whitespace_check (str : string) : unit =
-  let operator_char = Str.regexp "[! $ % & * + \\- . / : < = > ? @ ^ | ~]"
-  let infix_symbol = Str.regexp "[= < > @ ^ | & + \\- * / $ %]"
+  let operator_char = Str.regexp "[! $ % & * + \\- . / : < = > ? @ ^ | ~]" in
+  let infix_symbol = Str.regexp "[= < > @ ^ | & + \\- * / $ %]" in
+  ()

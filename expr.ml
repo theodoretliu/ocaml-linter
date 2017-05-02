@@ -19,16 +19,11 @@ type binop =
   | BoolBinop
 ;;
 
+(*
+Const has: Int, Float, Bool, Char, String, Unit
+*)
 type expr =
   | Var of varid                                (* variables *)
-  | Int of int                                  (* integers *)
-  | Float of float                              (* floats *)
-  | Bool of bool                                (* booleans *)
-  | Char of char                                (* chars *)
-  | String of string                            (* strings *)
-  | Unit                                        (* units *)
-  | Unop of unop * expr                         (* unary operators *)
-  | Binop of binop * expr * expr                (* binary operators *)
   | Conditional of expr * expr * expr option    (* if then else expressions *)
   | Fun of varid * expr                         (* function definitions *)
   | Let of varid * expr                         (* global naming *)

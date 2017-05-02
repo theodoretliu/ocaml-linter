@@ -1,10 +1,13 @@
-all: use linter inference
+all: use linter inference style
 
 use: use.ml
 	ocamlbuild use.byte
 
 linter: linter.ml
 	ocamlbuild linter.byte
+
+style: style.ml
+	ocamlbuild style.byte
 
 inference: inference.ml
 	ocamlbuild inference.byte
