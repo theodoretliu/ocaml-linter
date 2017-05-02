@@ -15,8 +15,8 @@ let main () =
     begin
       let s = read_file Sys.argv.(1) in
       let str = Style.contains_tabs_check s in
-      Style.line_length_check str;
-
+      Style.line_length_check str ;
+      Style.find_mismatch str ;
       if !Style.problem_free then
         print_endline "No problems detected!"
       else ()
