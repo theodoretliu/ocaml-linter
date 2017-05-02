@@ -89,17 +89,7 @@ rule token = parse
       with Not_found ->
         ID ident
     }
-  | ('-')? ((['0'-'9'] ['0'-'9' '_']*)
-         | ('0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f'] ['0'-'9' 'A'-'F' 'a'-'f' '_']*)
-         | ('0' ['o' 'O'] ['0'-'7'] ['0'-'7' '_']*)
-         | ('0' ['b' 'B'] ['0'-'1'] ['0'-'1' '_']*)) as integer_literal
-    {
-      INT (int_of_string integer_literal)
-    }
-  | ('-')? ['0'-'9'] ['0'-'9' '_']* ('.' ['0'-'9' '_']*)? (['e' 'E'] ['+' '-'] ['0'-'9'] ['0'-'9' '_']*)? as float_literal
-    {
-      FLOAT (float_of_string float_literal)
-    }
+
   (* capitalized ident *)
   
   | '\''(regular_char | escape_sequence)'\'' as char_literal
@@ -110,14 +100,6 @@ rule token = parse
     {
       STRING (String.sub string_literal 1 (String.length string_literal - 2))
     }
-  | '(' ' '+ '*' infix_symbol* operator_char* ' '* ')'
-  | '(' ' '*  ['=' '<' '>' '@' '^' '|' '&' '+' '-' '/' '$' '%'] operator_char* ' '* ')'
-  | '(' ' '* (('!' operator_char*) | (['?' '~'] operator_char+)) ' '* ')' as xfix_func
-      {
-        let re = Str.regexp "[\\( \\)]" in
-        let s = Str.global_replace re "" xfix_func in 
-        ID s
-      } 
   | two_sym as symbol
     { try
         let token = Hashtbl.find sym_table symbol in
@@ -140,15 +122,23 @@ rule token = parse
     {
       PREFIX prefix_op
     }
-  | id | '(' ' '* id ' '* ')' as word
-    { 
-      let re = Str.regexp "[\\( \\)]" in
-      let s = Str.global_replace re "" word in 
-      try
-          let token = Hashtbl.find keyword_table s in
+  | ((['0'-'9'] ['0'-'9' '_']*)
+         | ('0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f'] ['0'-'9' 'A'-'F' 'a'-'f' '_']*)
+         | ('0' ['o' 'O'] ['0'-'7'] ['0'-'7' '_']*)
+         | ('0' ['b' 'B'] ['0'-'1'] ['0'-'1' '_']*)) as integer_literal
+    {
+      INT (int_of_string integer_literal)
+    }
+  | ['0'-'9'] ['0'-'9' '_']* ('.' ['0'-'9' '_']*)? (['e' 'E'] ['+' '-'] ['0'-'9'] ['0'-'9' '_']*)? as float_literal
+    {
+      FLOAT (float_of_string float_literal)
+    }
+  | id as word
+    { try
+          let token = Hashtbl.find keyword_table word in
           token 
-      with Not_found ->
-          ID s
+        with Not_found ->
+          ID word
       }
   | '{' [^ '\n']* '}'   { token lexbuf }    (* skip one-line comments *)
   | [' ' '\t' '\n'] { token lexbuf }    (* skip whitespace *)
