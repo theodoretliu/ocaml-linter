@@ -35,7 +35,7 @@
 %nonassoc ELSE
 %left     PIPE
 %left     COMMA
-%right    DOT
+/*%right    DOT  for some reason, this broke match statements */
 %left     INFIX EQUAL
 %right    CONS
 %nonassoc BEGIN UNIT CHAR TRUE FALSE FLOAT INT
@@ -68,8 +68,8 @@ listexp:
   |                       { [] }
 
 matchexp:
-  | PIPE exp DOT exp PIPE matchexp    { ($2, $4) :: $6 }
-  | exp DOT exp PIPE matchexp         { ($1, $3) :: $5 }
+  | PIPE exp DOT exp matchexp         { ($2, $4) :: $5 }
+  | exp DOT exp matchexp              { ($1, $3) :: $4 }
   | PIPE exp DOT exp                  { [($2, $4)] }
   | exp DOT exp                       { [($1, $3)] }
 

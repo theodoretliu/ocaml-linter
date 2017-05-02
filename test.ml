@@ -1,5 +1,5 @@
-let y = (1, 2) ;;
+let y = ("x", "y") ;;
 
 let x =
   match y with
-  | (a, b)) -> a + b ;;
+  | (a, b) -> a ^ b ;;

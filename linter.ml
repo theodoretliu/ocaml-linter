@@ -27,11 +27,15 @@ let main () =
           (String.trim s) ^ ".."
         else (String.trim s) ^ ";;.." in
       let lexbuf = Lexing.from_string parse_ready in
-      let tree = Parser.input Lexer.token lexbuf in
-      List.iter Ast.find_singular_match tree ;
-      if !Style.problem_free then
-        print_endline "No problems detected!"
-      else ()
+      try
+        let tree = Parser.input Lexer.token lexbuf in
+        List.iter Ast.find_singular_match tree ;
+        if !Style.problem_free && !Ast.problem_free then
+          print_endline "No problems detected!"
+        else ()
+      with _ ->
+        print_endline ("We were unable to correctly parse your syntax. Look" ^
+                       " at our recommendations for unmatched delimiters!")
     end
   else
     print_endline "Usage: linter.byte filename" ;;
