@@ -10,15 +10,25 @@ let read_file (file_name : string) : string =
   close_in in_channel;
   str ;;
 
+let last (n : int) (s : string) : string =
+  let s = String.trim s in
+  String.sub s (String.length s - n) n
+
 let main () =
   if Array.length Sys.argv = 2 then
     begin
       let s = read_file Sys.argv.(1) in
       let str = Style.contains_tabs_check s in
-      Style.line_length_check str ;
-      Style.find_mismatch str ;
-      (* let l = Style.find_indent_errors str in
-      List.iter (Printf.printf "Line %d has improper indentation\n") l ; *)
+      Style.line_length_check str;
+      let parse_ready =
+        if last 2 s = ";;" then
+          s ^ ".."
+        else s ^ ";;.." in
+      let lexbuf = Lexing.from_string parse_ready in
+      let tree = Parser.input Lexer.token lexbuf in
+      List.iter Ast.find_singular_match tree ;
+      Style.trailing_whitespace_check str ;
+      Style.delimiter_mismatch_check str ;
       if !Style.problem_free then
         print_endline "No problems detected!"
       else ()

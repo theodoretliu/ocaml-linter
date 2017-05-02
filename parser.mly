@@ -75,21 +75,21 @@ matchexp:
 
 expnoapp:
   | ID                                { Var $1 }
-  | INT                               { Int $1 }
-  | TRUE                              { Bool true }
-  | FALSE                             { Bool false }
-  | FLOAT                             { Float $1 }
-  | STRING                            { String $1 }
-  | CHAR                              { Char $1 }
-  | OPEN CLOSE                        { Unit }
+  | INT                               { Const "int" }
+  | TRUE                              { Const "bool" }
+  | FALSE                             { Const "bool" }
+  | FLOAT                             { Const "float" }
+  | STRING                            { Const "string" }
+  | CHAR                              { Const "char" }
+  | OPEN CLOSE                        { Const "unit" }
   | OPEN exp CLOSE                    { $2 }
   | OPENBRACKET listexp CLOSEBRACKET  { List.fold_right
                                           (fun x y -> Cons (x, y)) $2 Nil }
-  | OPENBRACKET CLOSEBRACKET          { Nil }
   | exp CONS exp                      { Cons ($1, $3) }
   | exp INFIX exp                     { Infix ($2, $1, $3) }
   | PREFIX exp                        { Prefix ($1, $2) }
-  | FUNCTION ID DOT exp               { Fun ($2, $4) }
+  | FUNCTION x=ID+ DOT exp            { List.fold_right
+                                          (fun x y -> Fun (x, y)) x $4 }
   | x=INFIX exp                       { let y =
                                           match x with
                                           | "+" | "+." | "-" | "-." as x -> x
@@ -115,5 +115,9 @@ expnoapp:
                                                      MCons (x1, x2, y))
                                                   $4 MNil in
                                         Match ($2, l) }
-
+  | OPEN x=separated_nonempty_list(COMMA, exp) CLOSE
+      { match x with
+        | [h] -> h
+        | h :: t -> List.fold_right (fun x y -> TCons (x, y)) x TNil
+        | _ -> failwith "Impossible to arrive here" }
 %%

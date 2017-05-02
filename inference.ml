@@ -65,12 +65,7 @@ let annotate (e : expr) : aexpr =
     | App (e1, e2) ->
         let a = next_type_var () in 
         AApp (annotate' e1 bv, annotate' e2 bv, a)
-    | Int _ -> AConst (TVar "int")
-    | Float _ -> AConst (TVar "float")
-    | Bool _ -> AConst (TVar "bool")
-    | String _ -> AConst (TVar "string")
-    | Char _ -> AConst (TVar "char")
-    | Unit -> AConst (TVar "unit")
+    | Const s -> AConst (TVar s)
     | Let (x, e) ->
         let a = next_type_var () in
         let ae = annotate' e ((x, a) :: bv) in
@@ -104,8 +99,8 @@ let rec collect (aexprs : aexpr list) (u : (typing * typing) list) : (typing * t
   | ALetIn (_, ae1, ae2, b) :: r ->
       collect (ae1 :: ae2 :: r) u
   | AApp (ae1, ae2, a) :: r ->
-        let (f, b) = (type_of ae1, type_of ae2) in
-        collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
+      let (f, b) = (type_of ae1, type_of ae2) in
+      collect (ae1 :: ae2 :: r) ((f, TArrow (b, a)) :: u)
   | AInfix (s, ae1, ae2, a) :: r ->
       try
         let unknowns = [type_of ae1; type_of ae2; a] in
