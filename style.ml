@@ -31,5 +31,6 @@ let line_length_check (str : string) : unit =
 ;;
 
 let whitespace_check (str : string) : unit =
-  let operator_char = Str.regexp "[! $ % & * + \\- . / : < = > ? @ ^ | ~]"
-  let infix_symbol = Str.regexp "[= < > @ ^ | & + \\- * / $ %]"
+  let operator_char = Str.regexp "[! $ % & * + \\- . / : < = > ? @ ^ | ~]" in
+  let infix_symbol = Str.regexp "[= < > @ ^ | & + \\- * / $ %]" in
+  
