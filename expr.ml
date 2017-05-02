@@ -8,24 +8,24 @@
 
 (* Const has: Int, Float, Bool, Char, String, Unit *)
 type expr =
-  | Var of varid                                (* variables *)
-  | Const of varid                              (* literal constant *)
+  | App of expr * expr                          (* function applications *)
   | Conditional of expr * expr * expr option    (* if then else expressions *)
+  | Cons of expr * expr                         (* list Cons *)
+  | Const of varid                              (* literal constant *)
   | Fun of varid * expr                         (* function definitions *)
+  | Infix of string * expr * expr               (* infixed operators *)
   | Let of varid * expr                         (* global naming *)
   | LetIn of varid * expr * expr                (* local naming *)
   | LetRec of varid * expr                      (* recursive local naming *)
   | LetRecIn of varid * expr * expr             (* recursive global naming *)
-  | Raise                                       (* exceptions *)
-  | App of expr * expr                          (* function applications *)
-  | Cons of expr * expr                         (* list Cons *)
+  | Match of expr * expr
+  | MCons of expr * expr * expr
+  | MNil
   | Nil                                         (* list Nil *)
   | Prefix of string * expr                     (* prefixed operators *)
-  | Infix of string * expr * expr               (* infixed operators *)
-  | Match of expr * expr
-  | MNil
-  | MCons of expr * expr * expr
-  | TNil
+  | Raise                                       (* exceptions *)
   | TCons of expr * expr
+  | TNil
   | Unassigned                                  (* (temporarily) unassigned *)
+  | Var of varid                                (* variables *)
  and varid = string ;;
