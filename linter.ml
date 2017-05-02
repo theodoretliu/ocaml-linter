@@ -20,15 +20,15 @@ let main () =
       let s = read_file Sys.argv.(1) in
       let str = Style.contains_tabs_check s in
       Style.line_length_check str;
+      Style.trailing_whitespace_check str ;
+      Style.delimiter_mismatch_check str ;
       let parse_ready =
         if last 2 s = ";;" then
-          s ^ ".."
-        else s ^ ";;.." in
+          (String.trim s) ^ ".."
+        else (String.trim s) ^ ";;.." in
       let lexbuf = Lexing.from_string parse_ready in
       let tree = Parser.input Lexer.token lexbuf in
       List.iter Ast.find_singular_match tree ;
-      Style.trailing_whitespace_check str ;
-      Style.delimiter_mismatch_check str ;
       if !Style.problem_free then
         print_endline "No problems detected!"
       else ()

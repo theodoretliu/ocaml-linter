@@ -19,7 +19,7 @@ let rec find_singular_match (e : expr) : unit =
       find_singular_match e
   | LetIn (_v, e1, e2) | LetRecIn (_v, e1, e2) | Infix (_v, e1, e2) ->
       find_singular_match e1 ; find_singular_match e2
-  | App (e1, e2) | Cons (e1, e2)  ->
+  | App (e1, e2) | Cons (e1, e2) | TCons (e1, e2) ->
       find_singular_match e1 ; find_singular_match e2
   | MCons (e1, e2, e3) ->
       find_singular_match e1 ;
@@ -31,7 +31,7 @@ let rec find_singular_match (e : expr) : unit =
       begin match eo with
       | Some e3 -> find_singular_match e3
       | None -> () end
-  | Var _ | Raise | Nil | MNil | Const _ | Unassigned -> ()
+  | Var _ | Raise | Nil | TNil | MNil | Const _ | Unassigned -> ()
 
 (* let rec crawl_ast (e : expr) : unit =
   match e with
