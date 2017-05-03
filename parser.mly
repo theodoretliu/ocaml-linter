@@ -21,6 +21,7 @@
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
+%token TUPLEDELIMITER
 %token MATCH WITH
 %token SEMICOLON
 %token COMMA
@@ -67,6 +68,10 @@ listexp:
   | exp                   { [$1] }
   |                       { [] }
 
+tupleexp:
+  | exp COMMA tupleexp    { $1 :: $3 }
+  | exp                   { [$1] }
+
 matchexp:
   | PIPE exp DOT exp PIPE matchexp    { ($2, $4) :: $6 }
   | exp DOT exp PIPE matchexp         { ($1, $3) :: $5 }
@@ -87,6 +92,7 @@ expnoapp:
                                           (fun x y -> Cons (x, y)) $2 Nil }
   | exp CONS exp                      { Cons ($1, $3) }
   | exp INFIX exp                     { Infix ($2, $1, $3) }
+  | OPEN tupleexp CLOSE               { Tuple $2 }
   | PREFIX exp                        { Prefix ($1, $2) }
   | FUNCTION x=ID+ DOT exp            { List.fold_right
                                           (fun x y -> Fun (x, y)) x $4 }

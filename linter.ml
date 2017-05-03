@@ -15,25 +15,31 @@ let last (n : int) (s : string) : string =
   String.sub s (String.length s - n) n
 
 let main () =
-  if Array.length Sys.argv = 2 then
-    begin
-      let s = read_file Sys.argv.(1) in
-      let str = Style.contains_tabs_check s in
-      Style.line_length_check str;
-      let parse_ready =
-        if last 2 s = ";;" then
-          s ^ ".."
-        else s ^ ";;.." in
-      let lexbuf = Lexing.from_string parse_ready in
-      let tree = Parser.input Lexer.token lexbuf in
-      List.iter Ast.find_singular_match tree ;
-      Style.trailing_whitespace_check str ;
-      Style.delimiter_mismatch_check str ;
-      if !Style.problem_free then
-        print_endline "No problems detected!"
-      else ()
-    end
-  else
-    print_endline "Usage: linter.byte filename" ;;
+  if Array.length Sys.argv != 2 then
+    print_endline "Usage: linter.byte filename"
+  else begin
+    let s = read_file Sys.argv.(1) in
+
+    (* style checks *)
+    let str = Style.contains_tabs_check s in
+    Style.line_length_check str ;
+    Style.trailing_whitespace_check str ;
+    Style.delimiter_mismatch_check str ;
+    Style.spacing_around_operators_check str ;
+
+    (* appending a ';;..' to the end of the file to enable it to be parsed *)
+    let parse_ready =
+      if last 2 s = ";;" then
+        s ^ ".."
+      else s ^ ";;.." in
+
+    (* design/error checks *)
+    let lexbuf = Lexing.from_string parse_ready in
+    let tree = Parser.input Lexer.token lexbuf in
+    List.iter Ast.find_singular_match tree ;
+
+    if !Style.problem_free then
+      print_endline "No problems detected!"
+  end ;;
 
 main () ;;

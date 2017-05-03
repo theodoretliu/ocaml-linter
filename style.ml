@@ -47,11 +47,30 @@ let trailing_whitespace_check (str : string) : unit =
 
 
 
-let whitespace_check (str : string) : unit =
-  let operator_char = "[! $ % & * + \\- . / : < = > ? @ ^ | ~]" in
-  let infix_symbol = "[= < > @ ^ | & + \\- * / $ %]" in
-  let re = Str.regexp (operator_char ^ infix_symbol ^ "*") in
-  ()
+let spacing_around_operators_check (str : string) : unit =
+  let operator = "[:=&*+\\-./<=>@^|]+" in
+  let setoff = "[^ \n'\"]" in
+  let re = Str.regexp (setoff ^ operator ^ setoff) in
+  let rec helper i issues line str =
+    try
+      let s = Str.search_forward re str i in
+      helper (s + 2) ((line + 1, s) :: issues) line str
+    with Not_found -> issues
+  in
+  let lines = Str.split (Str.regexp "\n") str in
+  let issues = List.mapi (helper 0 []) lines in
+  let all = List.fold_right ( @ ) issues [] in
+  let len = List.length all in
+  if len > 0 then
+    begin
+      let (line, start) = List.nth all (len - 1) in
+      let wrong = String.sub (List.nth lines (line - 1)) start 3 in
+      printf "%d: %s\n" line wrong;
+      let right = String.sub wrong 0 1 ^ " " ^ String.sub wrong 1 1 ^ " " ^ String.sub wrong 2 1 in
+      printf "Warning: %d instance(s) of operators that are not delimited by spaces.\n" len;
+      printf "Example: on line %d, at char %d, %s should look like %s\n" line (start + 1) wrong right
+    end
+  else () ;;
 
 let rec delimiter_mismatch_check (str : string) =
     Parens.find_mismatch str 1 1 [] problem_free

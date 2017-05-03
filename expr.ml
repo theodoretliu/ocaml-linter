@@ -25,5 +25,6 @@ type expr =
   | Match of expr * expr
   | MNil
   | MCons of expr * expr * expr
+  | Tuple of expr list
   | Unassigned                                  (* (temporarily) unassigned *)
  and varid = string ;;
