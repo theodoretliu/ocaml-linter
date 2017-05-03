@@ -39,6 +39,7 @@ let rec expr_to_string (e : expr) : string =
   | TNil -> ""
   | Unassigned -> ""
   | Var v -> v
+
 let rec find_singular_match (e : expr) : unit =
   let rec depth (e : expr) : int =
     match e with
