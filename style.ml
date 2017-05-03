@@ -72,7 +72,7 @@ let spacing_around_operators_check (str : string) : unit =
 
 let rec delimiter_mismatch_check (str : string) =
   let r = Str.regexp "\"\\(\\\\\"\\|[^\"]\\)*\"\\|'\\(\\\\'\\|[^']\\)*'" in
-  let new_str = Str.global_replace r "#" str in
+  let new_str = Str.global_replace r "#" str |> Parens.remove_comments in
   Parens.find_mismatch new_str 1 1 [] problem_free
 
 let quote_mismatch_check (s : string) : unit =

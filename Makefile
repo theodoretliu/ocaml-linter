@@ -6,19 +6,19 @@ use: lexer parser
 	cp use.ml _build/use.ml
 
 lexer: lexer.mll
-	ocamlbuild lexer.ml
+	ocamlbuild -use-ocamlfind lexer.ml
 
 parser: parser.mly
-	ocamlbuild parser.ml
+	ocamlbuild -use-ocamlfind parser.ml
 
 linter: linter.ml
-	ocamlbuild linter.byte
+	ocamlbuild -use-ocamlfind linter.byte
 
 style: style.ml
-	ocamlbuild style.byte
+	ocamlbuild -use-ocamlfind style.byte
 
 inference: inference.ml
-	ocamlbuild inference.byte
+	ocamlbuild -use-ocamlfind inference.byte
 
 clean:
 	rm -r _build

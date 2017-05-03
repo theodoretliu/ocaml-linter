@@ -1,4 +1,9 @@
 open Printf
+module Re2 = Re2.Std.Re2
+
+let remove_comments (s : string) : string =
+  let r = Re2.create_exn "\\(\\*.*?\\*\\)" in
+  Re2.rewrite_exn r ~template:" " s
 
 let create_hashtable size init =
   let tbl = Hashtbl.create size in
@@ -82,7 +87,7 @@ let rec find_mismatch_quotes (s : string)
             if h = '\'' then
               begin if d <> 1 then
                 begin
-                  printf "Invalid character literal between line %d, col %d and line %d, col %d"
+                  printf "Invalid character literal between line %d, col %d and line %d, col %d\n"
                          line col l c ;
                   problem_free := false
                 end ;
@@ -107,7 +112,7 @@ let rec find_mismatch_quotes (s : string)
         find_mismatch_quotes (rest s) (l + 1) 1 d stack in_quotes problem_free
     | '#' ->
         if not in_quotes then
-          printf "Trying to escape quotes when not in string or character literal at line %d, column %d or mismatched quotes" l c ;
+          printf "Trying to escape quotes when not in string or character literal at line %d, column %d or mismatched quotes\n" l c ;
         find_mismatch_quotes (rest s) l (c + 1) (d + 1) stack
                              in_quotes problem_free
     | _ -> find_mismatch_quotes (rest s) l (c + 1) (d + 1) stack
@@ -115,7 +120,7 @@ let rec find_mismatch_quotes (s : string)
 
 let find_mismatch_quotes_real (s : string) (problem_free : bool ref) : unit =
   let r = Str.regexp "\\\\'\\|\\\\\"" in
-  let new_s = Str.global_replace r "#" s in
+  let new_s = Str.global_replace r "#" s |> remove_comments in
   find_mismatch_quotes new_s 1 1 0 [] false problem_free
 (*
     if String.length s = 1 then
