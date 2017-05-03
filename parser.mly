@@ -9,24 +9,19 @@
 %token OPENBRACKET CLOSEBRACKET
 %token LET DOT IN REC
 %token EQUALS
-%token CONS NIL APPEND
+%token CONS
 %token IF THEN ELSE
 %token FUNCTION
-%token RAISE FAILWITH
 %token <string> ID
 %token <int> INT
 %token <float> FLOAT
 %token <string> STRING
 %token <char> CHAR
 %token TRUE FALSE
-%token LISTOPEN LISTCLOSE
-%token DELIMITER
-%token TUPLEDELIMITER
 %token MATCH WITH
 %token SEMICOLON
 %token COMMA
 %token PIPE
-%token UNIT
 %token END
 
 %nonassoc IN
@@ -37,9 +32,9 @@
 %left     PIPE
 %left     COMMA
 /*%right    DOT  for some reason, this broke match statements */
-%left     INFIX EQUAL
+%left     INFIX EQUALS
 %right    CONS
-%nonassoc BEGIN UNIT CHAR TRUE FALSE FLOAT INT
+%nonassoc CHAR TRUE FALSE FLOAT INT
           OPENBRACKET CLOSEBRACKET OPEN CLOSE
           PREFIX STRING ID
 
@@ -93,8 +88,8 @@ expnoapp:
                                           (fun x y -> Fun (x, y)) x $4 }
   | x=INFIX exp                       { let y =
                                           match x with
-                                          | "+" | "+." | "-" | "-." as x -> x
-                                          | _ as x -> failwith "Invalid prefix"
+                                          | "+" | "+." | "-" | "-." -> x
+                                          | _ -> failwith "Invalid prefix"
                                         in Prefix ("~" ^ y, $2) }
   | IF exp THEN exp
       x=option(pair(ELSE, exp))       { let el =
@@ -104,7 +99,10 @@ expnoapp:
                                         Conditional ($2, $4, el) }
   | LET x=boption(REC) y=nonempty_list(ID)
       EQUALS z=exp a=option(preceded(IN, exp))
-      { let h :: t = y in
+      { let h, t =
+          match y with
+          | h :: t -> h, t
+          | [] -> failwith "Cannot get here because nonempty_list" in
         let l = List.fold_right (fun x y -> Fun (x, y)) t z in
         match x, a with
         | false, None -> Let (h, l)

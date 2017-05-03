@@ -19,7 +19,6 @@
                ("then", THEN);
                ("else", ELSE);
                ("let", LET);
-               ("raise", RAISE);
                ("rec", REC);
                ("true", TRUE);
                ("false", FALSE);
