@@ -45,8 +45,6 @@ let trailing_whitespace_check (str : string) : unit =
   in
   List.iteri test lines ;;
 
-
-
 let spacing_around_operators_check (str : string) : unit =
   let operator = "[:=&*+\\-./<=>@^|]+" in
   let setoff = "[^ \n'\"]" in
