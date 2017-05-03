@@ -82,29 +82,3 @@ let rec find_singular_match (e : expr) : unit =
       | None -> () end
   | Tuple l -> List.iter find_singular_match l
   | Const _ | MNil | Nil | Raise | Unassigned | Var _ -> ()
-
-(* let rec crawl_ast (e : expr) : unit =
-  match e with
-  | Var v -> ()
-  | Conditional (e1, e2, eo) -> ()
-  | Fun (v, e) -> ()
-  | Let (v, e) -> ()
-  | LetIn (v, e1, e2) -> ()
-  | LetRec (v, e) -> ()
-  | LetRecIn (v, e1, e2) -> ()
-  | Raise -> ()
-  | App (e1, e2) -> ()
-  | Cons (e1, e2) -> ()
-  | Nil -> ()
-  | Prefix (s, e) -> ()
-  | Infix (s, e1, e2) -> ()
-  | Match (e1, e2) -> crawl_ast e1; crawl_ast e2
-  | MNil -> ()
-  | MCons (e1, e2, e3) ->
-      match e3 with
-      | MNil -> printf "Warning: single match statement"
-      | MCons (_, _, _) -> ()
-      | _ -> failwith "Impossible: not MCons in MCons"
-  | Const v -> ()
-  | Unassigned -> ()
-;; *)
