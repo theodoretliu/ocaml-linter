@@ -101,6 +101,10 @@ rule token = parse
     {
       STRING (String.sub string_literal 1 (String.length string_literal - 2))
     }
+  | ','
+    {
+      COMMA
+    }
   | two_sym as symbol
     { try
         let token = Hashtbl.find sym_table symbol in
