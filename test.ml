@@ -1,6 +1,5 @@
-let y = ("\'", "\"") ;;
+let y = ("a"", "b") ;;
 
-let c = '';;
 let x =
   match y with
   | (a, b) -> a ^ b ;;

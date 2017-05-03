@@ -55,6 +55,9 @@ let rec delimiter_mismatch_check (str : string) =
   let r = Str.regexp "\"\\(\\\\\"\\|[^\"]\\)*\"\\|'\\(\\\\'\\|[^']\\)*'" in
   let new_str = Str.global_replace r "#" str in
   Parens.find_mismatch new_str 1 1 [] problem_free
+
+let quote_mismatch_check (s : string) : unit =
+  Parens.find_mismatch_quotes_real s problem_free
 (*
   let len = Bytes.length str in
   let copy = Bytes.copy str in

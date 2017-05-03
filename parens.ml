@@ -6,7 +6,7 @@ let create_hashtable size init =
   tbl
 
 let delimiters = create_hashtable 6 ['(', ')'; '[', ']'; '{', '}'; ')', ' ';
-                                     ']', ' '; '}', ' ']]
+                                     ']', ' '; '}', ' ']
 
 let rest s = String.sub s 1 (String.length s - 1)
 
@@ -54,11 +54,10 @@ let rec find_mismatch (s : string)
       if c = '\n' then find_mismatch (rest s) (line + 1) 1 stack problem_free
       else find_mismatch (rest s) line (column + 1) stack problem_free
 
-
-(*"\\\\'\\|\\\\\"" *)
-(* let rec find_mismatch_quotes (s : string)
+let rec find_mismatch_quotes (s : string)
                              (l : int)
                              (c : int)
+                             (d : int)
                              (stack : (char * int * int) list)
                              (in_quotes : bool)
                              (problem_free : bool ref)
@@ -68,11 +67,58 @@ let rec find_mismatch (s : string)
       begin
         problem_free := false ;
         List.iter (fun (x, l, c) ->
-                     printf "The %c at line %d, column %d is unmatched" x l c)
-                  (List.rev stack)
+                     printf "The %c at line %d, column %d is unmatched\n" x l c)
+                  (List.rev stack) ;
+        print_endline ("Just check in general to make sure all your strings" ^
+                       " are closed")
       end
     else ()
-  else if String.length s = 1 then
+  else
+    let a = s.[0] in
+    match a with
+    | '\'' ->
+        begin match stack with
+        | (h, line, col) :: t ->
+            if h = '\'' then
+              begin if d <> 1 then
+                begin
+                  printf "Invalid character literal between line %d, col %d and line %d, col %d"
+                         line col l c ;
+                  problem_free := false
+                end ;
+              find_mismatch_quotes (rest s) l (c + 1) d t false problem_free end
+            else find_mismatch_quotes (rest s) l (c + 1) d stack
+                                      true problem_free
+        | [] -> find_mismatch_quotes (rest s) l (c + 1) 0 [(a, l, c)] true
+                                     problem_free end
+    | '"' ->
+        begin match stack with
+        | (h, line, col) :: t ->
+            if h = '"' then
+              find_mismatch_quotes (rest s) l (c + 1) d t false problem_free
+            else find_mismatch_quotes (rest s) l (c + 1) (d + 1) stack
+                                      true problem_free
+        | [] ->
+            find_mismatch_quotes (rest s) l (c + 1) 0 [(a, l, c)] true
+                                 problem_free end
+    | '\\' ->
+        find_mismatch_quotes (rest s) l (c + 1) d stack in_quotes problem_free
+    | '\n' ->
+        find_mismatch_quotes (rest s) (l + 1) 1 d stack in_quotes problem_free
+    | '#' ->
+        if not in_quotes then
+          printf "Trying to escape quotes when not in string or character literal at line %d, column %d or mismatched quotes" l c ;
+        find_mismatch_quotes (rest s) l (c + 1) (d + 1) stack
+                             in_quotes problem_free
+    | _ -> find_mismatch_quotes (rest s) l (c + 1) (d + 1) stack
+                                in_quotes problem_free
+
+let find_mismatch_quotes_real (s : string) (problem_free : bool ref) : unit =
+  let r = Str.regexp "\\\\'\\|\\\\\"" in
+  let new_s = Str.global_replace r "#" s in
+  find_mismatch_quotes new_s 1 1 0 [] false problem_free
+(*
+    if String.length s = 1 then
     let x = s.[0] in
     if x = '"' || x = '\'' then
       begin match stack with
@@ -111,7 +157,7 @@ let rec find_mismatch (s : string)
               if len = 2 then
                 let third = s.get[2] in
 
-            end *)
-
+            end
+ *)
 
 

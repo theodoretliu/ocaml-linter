@@ -22,6 +22,7 @@ let main () =
       Style.line_length_check str;
       Style.trailing_whitespace_check str ;
       Style.delimiter_mismatch_check str ;
+      Style.quote_mismatch_check str ;
       let parse_ready =
         if last 2 s = ";;" then
           (String.trim s) ^ ".."
