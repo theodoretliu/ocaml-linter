@@ -21,6 +21,7 @@
 %token TRUE FALSE
 %token LISTOPEN LISTCLOSE
 %token DELIMITER
+%token TUPLEDELIMITER
 %token MATCH WITH
 %token SEMICOLON
 %token COMMA
@@ -116,8 +117,6 @@ expnoapp:
                                                   $4 MNil in
                                         Match ($2, l) }
   | OPEN x=separated_nonempty_list(COMMA, exp) CLOSE
-      { match x with
-        | [h] -> h
-        | h :: t -> List.fold_right (fun x y -> TCons (x, y)) x TNil
-        | _ -> failwith "Impossible to arrive here" }
+      { Tuple x }
+
 %%

@@ -24,8 +24,7 @@ type expr =
   | Nil                                         (* list Nil *)
   | Prefix of string * expr                     (* prefixed operators *)
   | Raise                                       (* exceptions *)
-  | TCons of expr * expr
-  | TNil
+  | Tuple of expr list
   | Unassigned                                  (* (temporarily) unassigned *)
   | Var of varid                                (* variables *)
  and varid = string ;;

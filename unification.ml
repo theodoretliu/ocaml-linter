@@ -5,6 +5,7 @@ type typing =
   | TVar of varid
   | TStruct of string * typing
   | TArrow of typing * typing
+  | TTuple of typing list
 
 type environment = (varid * typing) list
 
@@ -14,8 +15,9 @@ let rec sub (a : typing) (id : varid) (b : typing) : typing =
   | TVar x -> if x = id then a else b
   | TArrow (x, y) -> TArrow (sub a id x, sub a id y)
   | TStruct (t, x) -> TStruct (t, sub a id x)
+  | TTuple l -> TTuple (List.map (sub a id) l)
 
-(* 
+(*
   Apply our environment of appropriate subs
   to a typing to get a new typing
 *)
@@ -32,13 +34,14 @@ let rec unify (a : typing) (b : typing) : environment =
   | TArrow (w, x), TArrow (y, z) -> (unify w y) @ (unify x z)
   | TVar x, ar | ar, TVar x -> [(x, ar)]
   | TStruct (_, x), ar | ar, TStruct (_, x) -> unify x ar
+  | TTuple l, t | t, TTuple l -> List.fold_right (fun x y -> (unify x t) @ y) l []
 
 let rec unify_list (l : (typing * typing) list) : environment =
   match l with
   | [] -> []
   | (a, b) :: t -> (unify a b) @ (unify_list t)
 
-(* 
+(*
   I think the idea here is now we have
   parts of expr hash to unique characters
   and hash these unique characters to

@@ -2,6 +2,12 @@ open Expr
 open Printf
 let problem_free = ref true
 
+let rec join (d : string) (sl : string list) : string =
+  match sl with
+  | [] -> ""
+  | [h] -> h
+  | h :: t -> h ^ d ^ (join d t)
+
 let rec expr_to_string (e : expr) : string =
   match e with
   | App (e1, e2) ->
@@ -35,8 +41,7 @@ let rec expr_to_string (e : expr) : string =
   | Nil -> "[]"
   | Prefix (o, e) -> sprintf "%s (%s)" o (expr_to_string e)
   | Raise -> ""
-  | TCons (e1, e2) -> sprintf "%s, %s" (expr_to_string e1) (expr_to_string e2)
-  | TNil -> ""
+  | Tuple l -> join ", " (List.map expr_to_string l)
   | Unassigned -> ""
   | Var v -> v
 
@@ -63,7 +68,7 @@ let rec find_singular_match (e : expr) : unit =
       find_singular_match e
   | Infix (_v, e1, e2) | LetIn (_v, e1, e2) | LetRecIn (_v, e1, e2) ->
       find_singular_match e1 ; find_singular_match e2
-  | App (e1, e2) | Cons (e1, e2) | TCons (e1, e2) ->
+  | App (e1, e2) | Cons (e1, e2) ->
       find_singular_match e1 ; find_singular_match e2
   | MCons (e1, e2, e3) ->
       find_singular_match e1 ;
@@ -75,7 +80,8 @@ let rec find_singular_match (e : expr) : unit =
       begin match eo with
       | Some e3 -> find_singular_match e3
       | None -> () end
-  | Const _ | MNil | Nil | Raise | TNil | Unassigned | Var _ -> ()
+  | Tuple l -> List.iter find_singular_match l
+  | Const _ | MNil | Nil | Raise | Unassigned | Var _ -> ()
 
 (* let rec crawl_ast (e : expr) : unit =
   match e with
