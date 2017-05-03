@@ -1,3 +1,1 @@
-<AsnLib> or <Lib>: include
-<_build>: include
-<**/*>  : thread, use_unix, use_menhir, use_str, strict-sequence, warn(A-4-33-40-41-42-43-34-44), debug
+true: use_menhir, use_str, warn_a, debug
