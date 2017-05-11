@@ -118,6 +118,14 @@ rule token = parse
       with Not_found ->
         INFIX (String.make 1 symbol)
     }
+  | '(' ' '+ '*' infix_symbol* operator_char* ' '* ')'
+  | '(' ' '*  ['=' '<' '>' '@' '^' '|' '&' '+' '-' '/' '$' '%'] operator_char* ' '* ')'
+  | '(' ' '* (('!' operator_char*) | (['?' '~'] operator_char+)) ' '* ')' as xfix_func
+      {
+        let re = Str.regexp "[\\( \\)]" in
+        let s = Str.global_replace re "" xfix_func in 
+        ID s
+      } 
   | infix_symbol operator_char* as infix_op
     {
       INFIX infix_op
